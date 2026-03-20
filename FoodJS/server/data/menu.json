@@ -1,0 +1,28 @@
+{
+  "menu": [
+    {
+      "id": 1,
+      "name": "Cheese Burger",
+      "description": "Two juicy beef patties stacked with melted cheddar, fresh lettuce, tomato, red onion, and pickles on a toasted brioche bun.",
+      "price": 49,
+      "category": "Burger",
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "name": "Fried Chicken Burger",
+      "description": "Golden fried chicken fillet layered with melted cheddar, fresh tomato, crisp lettuce, and creamy sauce on a soft sesame seed bun.",
+      "price": 60,
+      "category": "Burger",
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "name": "Vegie Burger",
+      "description": "A hearty veggie patty loaded with fresh cucumber, tomato, red onion, bell pepper, and crisp lettuce on a toasted sesame bun.",
+      "price": 45,
+      "category": "Burger",
+      "isAvailable": false
+    }
+  ]
+}
