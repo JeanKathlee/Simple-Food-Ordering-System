@@ -4,7 +4,7 @@
       "id": 1,
       "name": "System Admin",
       "email": "admin@food.local",
-      "passwordHash": "$2a$10$9gM6OjI2VwPVmA7J2TjvIuzbFxjIhP7v7nY5p2T6f4B7oJjM2h3sG",
+      "passwordHash": "$2a$10$6dYFHHNABW9Zf6tn.qpwLujhlMMVIGXoAwgn.ljM18t3zTe8Wmey6",
       "role": "admin",
       "createdAt": "2026-03-20T08:00:00.000Z"
     },
@@ -12,7 +12,7 @@
       "id": 2,
       "name": "Juan Dela Cruz",
       "email": "juan@food.local",
-      "passwordHash": "$2a$10$A4iT7QxVnS2uM8kP3hLr6eJ5fN0dW9cY1bR2tU7iO4pE6qZ8xC1dK",
+      "passwordHash": "$2a$10$zYz5aM6HSXje0xk9D8oUqeC6f9YMXqypC.BuV4Nbss/i9h49cJlX2",
       "role": "customer",
       "createdAt": "2026-03-20T08:05:00.000Z"
     }

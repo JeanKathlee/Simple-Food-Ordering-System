@@ -175,6 +175,10 @@ body {
   color: #666;
 }
 
+.demo-creds {
+  margin-top: -8px;
+}
+
 .link {
   color: #ff7a00;
   font-weight: 600;
@@ -191,6 +195,73 @@ body {
   color: #888;
   margin-bottom: 10px;
   cursor: pointer;
+}
+
+.form-error {
+  color: #d7263d;
+  font-size: 13px;
+  margin-top: -8px;
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.dashboard-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fff8ef 0%, #ffffff 45%);
+  padding: 32px;
+}
+
+.dashboard-header {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.dashboard-kicker {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8b8b8b;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  color: #1a1a1a;
+}
+
+.dashboard-logout {
+  width: auto;
+  padding: 0 18px;
+}
+
+.dashboard-content {
+  max-width: 980px;
+  margin: 28px auto 0;
+}
+
+.dashboard-card {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  padding: 28px;
+}
+
+.dashboard-card h2 {
+  margin-bottom: 8px;
+  color: #1f1f1f;
+}
+
+.dashboard-card p {
+  color: #505050;
+  margin-top: 10px;
 }
 
 @keyframes fadeInUp {
@@ -213,5 +284,14 @@ body {
   }
   .image-box {
     max-width: 400px;
+  }
+
+  .dashboard-page {
+    padding: 20px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
