@@ -48,83 +48,58 @@ export default function Login() {
   };
 
   return (
-    <div className="page">
-      <motion.div 
-        className="image-section left"
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
+    <div className="auth-page">
+      <motion.form
+        className="auth-card"
+        onSubmit={handleLogin}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
-        <div className="image-box">
-          <img src="/src/assets/login-food.svg" alt="Login Illustration" />
+        <h2 className="auth-title">LOGIN</h2>
+
+        <div className="input-group">
+          <input
+            className="input"
+            type="email"
+            placeholder="Username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <span className="icon">👤</span>
         </div>
-      </motion.div>
 
-      <motion.div 
-        className="form-section"
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <form className="form-card" onSubmit={handleLogin}>
-          <div className="title">Welcome Back</div>
-          <p className="text demo-creds">Demo: admin@food.local / admin123</p>
+        <div className="input-group">
+          <input
+            className="input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <span className="icon">🔒</span>
+        </div>
 
-          <div className="input-group">
-            <input
-              className="input"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-            <span className="icon">👤</span>
-          </div>
+        {error && <p className="form-error">{error}</p>}
 
-          <div className="input-group">
-            <input
-              className="input"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
-            <span className="icon">🔒</span>
-          </div>
+        <div className="forgot">Forgot Password?</div>
 
-          {error ? <p className="form-error">{error}</p> : null}
+        <button className="btn-primary" type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
-          <div className="forgot">Forgot Password?</div>
+        <button className="btn-secondary" type="button">
+          Login with Google
+        </button>
 
-          <motion.button 
-            className="btn-primary"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </motion.button>
-
-          <motion.button 
-            className="btn-secondary"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="button"
-          >
-            Login with Google
-          </motion.button>
-
-          <div className="text">
-            Don’t have an account?{" "}
-            <Link to="/register" className="link">
-              Sign up
-            </Link>
-          </div>
-        </form>
-      </motion.div>
+        <p className="text">
+          Don’t have an account?{" "}
+          <Link to="/register" className="link">
+            Sign Up
+          </Link>
+        </p>
+      </motion.form>
     </div>
   );
 }
