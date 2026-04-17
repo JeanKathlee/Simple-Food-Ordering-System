@@ -14,11 +14,13 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       {/* HEADER */}
-      <div className="topbar">
+      <div className="topbar compact page-header">
         <h1>Dashboard</h1>
-        <button className="btn-primary" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="page-header-actions">
+          <button className="btn-primary" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* STATS */}
