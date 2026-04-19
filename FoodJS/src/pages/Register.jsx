@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import logo from "../../assets/logo.png";
 
 export default function Register() {
   return (
@@ -9,6 +10,10 @@ export default function Register() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        <div className="auth-brand">
+          <img className="auth-logo" src={logo} alt="FoodJS logo" />
+        </div>
+
         <h2 className="auth-title">CREATE ACCOUNT</h2>
 
         <div className="input-group">
@@ -39,7 +44,7 @@ export default function Register() {
 
         <p className="text">
           Already have an account?{" "}
-          <Link to="/" className="link">
+          <Link to="/login" className="link">
             Sign-in
           </Link>
         </p>

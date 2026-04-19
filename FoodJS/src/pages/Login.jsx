@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { isAuthenticated, saveAuthSession } from "../lib/auth";
+import logo from "../../assets/logo.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -55,6 +56,10 @@ export default function Login() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        <div className="auth-brand">
+          <img className="auth-logo" src={logo} alt="FoodJS logo" />
+        </div>
+
         <h2 className="auth-title">LOGIN</h2>
 
         <div className="input-group">
