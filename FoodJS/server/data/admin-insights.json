@@ -1,0 +1,12 @@
+{
+  "weeklyRevenue": [
+    { "day": "Mon", "amount": 8250 },
+    { "day": "Tue", "amount": 9100 },
+    { "day": "Wed", "amount": 9800 },
+    { "day": "Thu", "amount": 10250 },
+    { "day": "Fri", "amount": 11420 },
+    { "day": "Sat", "amount": 12300 },
+    { "day": "Sun", "amount": 10760 }
+  ],
+  "statusOptions": ["Pending", "Completed", "Cancelled"]
+}

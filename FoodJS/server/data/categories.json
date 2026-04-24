@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "id": "cat-burgers",
+      "name": "Burgers",
+      "description": "Classic and premium burger options"
+    },
+    {
+      "id": "cat-sides",
+      "name": "Sides",
+      "description": "Fries and add-ons"
+    },
+    {
+      "id": "cat-drinks",
+      "name": "Drinks",
+      "description": "Cold beverages and shakes"
+    },
+    {
+      "id": "cat-desserts",
+      "name": "Desserts",
+      "description": "Sweet treats"
+    }
+  ]
+}

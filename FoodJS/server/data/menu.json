@@ -1,28 +1,59 @@
 {
   "menu": [
     {
-      "id": 1,
-      "name": "Cheese Burger",
-      "description": "Two juicy beef patties stacked with melted cheddar, fresh lettuce, tomato, red onion, and pickles on a toasted brioche bun.",
-      "price": 49,
-      "category": "Burger",
-      "isAvailable": true
+      "id": "M-1001",
+      "name": "Double Smash Burger",
+      "description": "Double-seared beef patties with cheddar, lettuce, onions, and signature sauce.",
+      "price": 179,
+      "categoryId": "cat-burgers",
+      "category": "Burgers",
+      "prepTime": 12,
+      "isAvailable": true,
+      "soldCount": 162
     },
     {
-      "id": 2,
+      "id": "M-1002",
       "name": "Fried Chicken Burger",
-      "description": "Golden fried chicken fillet layered with melted cheddar, fresh tomato, crisp lettuce, and creamy sauce on a soft sesame seed bun.",
-      "price": 60,
-      "category": "Burger",
-      "isAvailable": true
+      "description": "Crispy chicken fillet with slaw, house mayo, and pickles.",
+      "price": 149,
+      "categoryId": "cat-burgers",
+      "category": "Burgers",
+      "prepTime": 14,
+      "isAvailable": true,
+      "soldCount": 298
     },
     {
-      "id": 3,
-      "name": "Vegie Burger",
-      "description": "A hearty veggie patty loaded with fresh cucumber, tomato, red onion, bell pepper, and crisp lettuce on a toasted sesame bun.",
-      "price": 45,
-      "category": "Burger",
-      "isAvailable": false
+      "id": "M-1003",
+      "name": "Truffle Fries",
+      "description": "Crisp fries tossed in truffle seasoning and parmesan.",
+      "price": 119,
+      "categoryId": "cat-sides",
+      "category": "Sides",
+      "prepTime": 8,
+      "isAvailable": true,
+      "soldCount": 221
+    },
+    {
+      "id": "M-1004",
+      "name": "Iced Tea",
+      "description": "Fresh brewed house iced tea.",
+      "price": 69,
+      "categoryId": "cat-drinks",
+      "category": "Drinks",
+      "prepTime": 4,
+      "isAvailable": true,
+      "soldCount": 198
+    },
+    {
+      "id": "M-1005",
+      "name": "Chocolate Sundae",
+      "description": "Vanilla ice cream topped with chocolate syrup and crunch.",
+      "price": 95,
+      "categoryId": "cat-desserts",
+      "category": "Desserts",
+      "prepTime": 6,
+      "isAvailable": false,
+      "soldCount": 84
     }
   ]
 }

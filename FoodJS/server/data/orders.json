@@ -1,25 +1,97 @@
 {
   "orders": [
     {
-      "id": 1,
+      "id": "ORD-2401",
       "userId": 2,
+      "customerName": "Maria Santos",
       "items": [
         {
-          "menuItemId": 1,
-          "name": "Cheese Burger",
-          "price": 49,
-          "quantity": 2
+          "menuItemId": "M-1001",
+          "name": "Double Smash Burger",
+          "price": 179,
+          "quantity": 1
         },
         {
-          "menuItemId": 2,
-          "name": "Fried Chicken Burger",
-          "price": 60,
+          "menuItemId": "M-1003",
+          "name": "Truffle Fries",
+          "price": 119,
           "quantity": 1
         }
       ],
+      "itemCount": 3,
+      "total": 398,
+      "status": "Completed",
+      "createdAt": "2026-04-24T08:20:00.000Z",
+      "updatedAt": "2026-04-24T08:20:00.000Z"
+    },
+    {
+      "id": "ORD-2402",
+      "userId": 3,
+      "customerName": "John Reyes",
+      "items": [
+        {
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 1
+        }
+      ],
+      "itemCount": 2,
+      "total": 218,
       "status": "Pending",
-      "createdAt": "2026-03-20T09:00:00.000Z",
-      "updatedAt": "2026-03-20T09:00:00.000Z"
+      "createdAt": "2026-04-24T09:05:00.000Z",
+      "updatedAt": "2026-04-24T09:05:00.000Z"
+    },
+    {
+      "id": "ORD-2403",
+      "userId": 4,
+      "customerName": "Angela Cruz",
+      "items": [
+        {
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 1
+        }
+      ],
+      "itemCount": 1,
+      "total": 149,
+      "status": "Cancelled",
+      "createdAt": "2026-04-24T10:15:00.000Z",
+      "updatedAt": "2026-04-24T10:15:00.000Z"
+    },
+    {
+      "id": "ORD-2404",
+      "userId": 5,
+      "customerName": "Michael Tan",
+      "items": [],
+      "itemCount": 4,
+      "total": 546,
+      "status": "Completed",
+      "createdAt": "2026-04-23T14:40:00.000Z",
+      "updatedAt": "2026-04-23T14:40:00.000Z"
+    },
+    {
+      "id": "ORD-2405",
+      "userId": 6,
+      "customerName": "Sofia Lim",
+      "items": [],
+      "itemCount": 2,
+      "total": 267,
+      "status": "Pending",
+      "createdAt": "2026-04-23T17:12:00.000Z",
+      "updatedAt": "2026-04-23T17:12:00.000Z"
+    },
+    {
+      "id": "ORD-2406",
+      "userId": 7,
+      "customerName": "Carlos Bautista",
+      "items": [],
+      "itemCount": 3,
+      "total": 322,
+      "status": "Completed",
+      "createdAt": "2026-04-22T11:35:00.000Z",
+      "updatedAt": "2026-04-22T11:35:00.000Z"
     }
   ]
 }

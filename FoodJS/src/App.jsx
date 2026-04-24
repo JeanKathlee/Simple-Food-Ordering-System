@@ -3,13 +3,38 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import CustomerMenuPlaceholder from "./pages/CustomerMenuPlaceholder";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
-import { isAuthenticated } from "./lib/auth";
+import { getUserRole, isAuthenticated } from "./lib/auth";
 
 function ProtectedRoute({ children }) {
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function AdminRoute({ children }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (getUserRole() !== "admin") {
+    return <Navigate to="/menu" replace />;
+  }
+
+  return children;
+}
+
+function CustomerRoute({ children }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (getUserRole() === "admin") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -25,9 +50,17 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <Dashboard />
-            </ProtectedRoute>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/menu"
+          element={
+            <CustomerRoute>
+              <CustomerMenuPlaceholder />
+            </CustomerRoute>
           }
         />
         <Route

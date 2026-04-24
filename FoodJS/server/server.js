@@ -9,10 +9,14 @@ app.use(express.json());
 const menuRouter = require('./routes/menu');
 const ordersRouter = require('./routes/orders');
 const usersRouter = require('./routes/users');
+const categoriesRouter = require('./routes/categories');
+const adminInsightsRouter = require('./routes/adminInsights');
 
 app.use('/api/menu', menuRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/admin-insights', adminInsightsRouter);
 
 app.get('/', (_req, res) => {
   res.json({

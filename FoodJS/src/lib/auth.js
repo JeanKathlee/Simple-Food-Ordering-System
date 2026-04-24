@@ -25,3 +25,16 @@ export function isAuthenticated() {
   const session = getAuthSession();
   return Boolean(session?.token && session?.user);
 }
+
+export function getUserRole() {
+  const session = getAuthSession();
+  return session?.user?.role || null;
+}
+
+export function isAdmin() {
+  return getUserRole() === 'admin';
+}
+
+export function isCustomer() {
+  return getUserRole() === 'customer';
+}

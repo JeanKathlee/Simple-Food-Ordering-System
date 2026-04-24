@@ -2,8 +2,12 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { isAuthenticated, saveAuthSession } from "../lib/auth";
+import { getAuthSession, isAuthenticated, saveAuthSession } from "../lib/auth";
 import logo from "../../assets/logo.png";
+
+function getRoleRoute(role) {
+  return role === "admin" ? "/dashboard" : "/menu";
+}
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,7 +18,8 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate("/dashboard", { replace: true });
+      const role = getAuthSession()?.user?.role;
+      navigate(getRoleRoute(role), { replace: true });
     }
   }, [navigate]);
 
@@ -40,7 +45,7 @@ export default function Login() {
       }
 
       saveAuthSession({ token: payload.token, user: payload.user });
-      navigate("/dashboard", { replace: true });
+      navigate(getRoleRoute(payload?.user?.role), { replace: true });
     } catch (_networkError) {
       setError("Cannot connect to server. Please try again.");
     } finally {
