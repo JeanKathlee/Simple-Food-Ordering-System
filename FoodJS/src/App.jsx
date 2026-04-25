@@ -3,6 +3,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
 import { isAuthenticated } from "./lib/auth";
@@ -35,6 +36,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product/:name"
+          element={
+            <ProtectedRoute>
+              <ProductDetails />
             </ProtectedRoute>
           }
         />
