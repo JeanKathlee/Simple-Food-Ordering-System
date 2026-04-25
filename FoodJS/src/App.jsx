@@ -3,18 +3,11 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import CustomerMenuPlaceholder from "./pages/CustomerMenuPlaceholder";
+import Menu from "./pages/Menu";
+import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
 import { getUserRole, isAuthenticated } from "./lib/auth";
-
-function ProtectedRoute({ children }) {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-}
 
 function AdminRoute({ children }) {
   if (!isAuthenticated()) {
@@ -59,24 +52,32 @@ export default function App() {
           path="/menu"
           element={
             <CustomerRoute>
-              <CustomerMenuPlaceholder />
+              <Menu />
             </CustomerRoute>
           }
         />
         <Route
           path="/checkout"
           element={
-            <ProtectedRoute>
+            <CustomerRoute>
               <Checkout />
-            </ProtectedRoute>
+            </CustomerRoute>
+          }
+        />
+        <Route
+          path="/product/:name"
+          element={
+            <CustomerRoute>
+              <ProductDetails />
+            </CustomerRoute>
           }
         />
         <Route
           path="/order-tracking"
           element={
-            <ProtectedRoute>
+            <CustomerRoute>
               <OrderTracking />
-            </ProtectedRoute>
+            </CustomerRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
