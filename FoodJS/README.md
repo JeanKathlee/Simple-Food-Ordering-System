@@ -1,16 +1,18 @@
-# React + Vite
+# FoodJS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Project is organized into separate app folders:
 
-Currently, two official plugins are available:
+- `frontend/`: React + Vite app
+- `backend/`: Express API app
+- `server/`: Compatibility copy of backend (kept to avoid breaking active terminal sessions)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run
 
-## React Compiler
+From project root:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install dependencies
+   - `npm run install:all`
+2. Start backend
+   - `npm run dev:backend`
+3. Start frontend (in another terminal)
+   - `npm run dev:frontend`

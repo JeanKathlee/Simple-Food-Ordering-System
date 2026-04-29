@@ -1,0 +1,108 @@
+{
+  "menu": [
+    {
+      "id": "M-1001",
+      "name": "Double Smash Burger",
+      "description": "Double-seared beef patties with cheddar, lettuce, onions, and signature sauce.",
+      "price": 179,
+      "categoryId": "cat-burgers",
+      "category": "Burgers",
+      "prepTime": 12,
+      "isAvailable": true,
+      "soldCount": 162,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-1002",
+      "name": "Fried Chicken Burger",
+      "description": "Crispy chicken fillet with slaw, house mayo, and pickles.",
+      "price": 149,
+      "categoryId": "cat-burgers",
+      "category": "Burgers",
+      "prepTime": 10,
+      "isAvailable": true,
+      "soldCount": 128,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-1003",
+      "name": "Classic Cheese Burger",
+      "description": "Juicy beef patty with melted cheese, fresh tomato, and lettuce.",
+      "price": 129,
+      "categoryId": "cat-burgers",
+      "category": "Burgers",
+      "prepTime": 10,
+      "isAvailable": true,
+      "soldCount": 95,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-2001",
+      "name": "Crispy Fries",
+      "description": "Golden fried potato strips with sea salt.",
+      "price": 89,
+      "categoryId": "cat-sides",
+      "category": "Sides",
+      "prepTime": 6,
+      "isAvailable": true,
+      "soldCount": 220,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-2002",
+      "name": "Loaded Fries",
+      "description": "Crispy fries topped with cheese, bacon, and sour cream.",
+      "price": 159,
+      "categoryId": "cat-sides",
+      "category": "Sides",
+      "prepTime": 8,
+      "isAvailable": true,
+      "soldCount": 87,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-3001",
+      "name": "Iced Cola",
+      "description": "Refreshing cola over ice.",
+      "price": 59,
+      "categoryId": "cat-drinks",
+      "category": "Drinks",
+      "prepTime": 2,
+      "isAvailable": true,
+      "soldCount": 341,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-3002",
+      "name": "Mango Shake",
+      "description": "Creamy mango blended shake with milk and ice.",
+      "price": 99,
+      "categoryId": "cat-drinks",
+      "category": "Drinks",
+      "prepTime": 4,
+      "isAvailable": true,
+      "soldCount": 145,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    },
+    {
+      "id": "M-4001",
+      "name": "Chocolate Cake",
+      "description": "Rich chocolate cake with fudge frosting.",
+      "price": 89,
+      "categoryId": "cat-desserts",
+      "category": "Desserts",
+      "prepTime": 3,
+      "isAvailable": true,
+      "soldCount": 56,
+      "createdAt": "2026-04-29T15:46:15.446Z",
+      "updatedAt": "2026-04-29T15:46:15.446Z"
+    }
+  ]
+}
