@@ -1,12 +1,76 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { saveAuthSession, isAuthenticated, getAuthSession } from "../lib/auth";
 import logo from "../../assets/logo.png";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const role = getAuthSession()?.user?.role;
+      navigate(role === "admin" ? "/dashboard" : "/menu", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setError(payload?.message || "Unable to register right now.");
+        return;
+      }
+
+      saveAuthSession({ token: payload.token, user: payload.user });
+      navigate("/menu", { replace: true });
+    } catch (_networkError) {
+      setError("Cannot connect to server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-page">
-      <motion.div
+      <motion.form
         className="auth-card"
+        onSubmit={handleRegister}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -17,17 +81,37 @@ export default function Register() {
         <h2 className="auth-title">CREATE ACCOUNT</h2>
 
         <div className="input-group">
-          <input className="input" placeholder="Username" />
+          <input
+            className="input"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
           <span className="icon">👤</span>
         </div>
 
-        <div className="row">
-          <input className="input" placeholder="First Name" />
-          <input className="input" placeholder="Last Name" />
+        <div className="input-group">
+          <input
+            className="input"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <span className="icon">✉️</span>
         </div>
 
         <div className="input-group">
-          <input className="input" type="password" placeholder="Password" />
+          <input
+            className="input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <span className="icon">🔒</span>
         </div>
 
@@ -36,11 +120,18 @@ export default function Register() {
             className="input"
             type="password"
             placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
           />
           <span className="icon">🔒</span>
         </div>
 
-        <button className="btn-primary">Sign-up</button>
+        {error && <p className="form-error">{error}</p>}
+
+        <button className="btn-primary" type="submit" disabled={loading}>
+          {loading ? "Creating Account..." : "Sign-up"}
+        </button>
 
         <p className="text">
           Already have an account?{" "}
@@ -48,7 +139,7 @@ export default function Register() {
             Sign-in
           </Link>
         </p>
-      </motion.div>
+      </motion.form>
     </div>
   );
 }

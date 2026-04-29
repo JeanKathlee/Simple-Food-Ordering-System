@@ -15,6 +15,22 @@
       "passwordHash": "$2a$10$zYz5aM6HSXje0xk9D8oUqeC6f9YMXqypC.BuV4Nbss/i9h49cJlX2",
       "role": "customer",
       "createdAt": "2026-03-20T08:05:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "passwordHash": "$2a$10$M/OGhacHCJ8/D04PAXYdQ.u7ZfWI1iNp4Wjjpv4/nMj00NeDga4nC",
+      "role": "customer",
+      "createdAt": "2026-04-29T16:03:57.725Z"
+    },
+    {
+      "id": 4,
+      "name": "Allain James Ybanez",
+      "email": "alinjims18@gmail.com",
+      "passwordHash": "$2a$10$Un.bEXg/VhXHU6XTBApSDOvQed5nzT5qr2A2EhuSihf7pkMHU/Yya",
+      "role": "customer",
+      "createdAt": "2026-04-29T16:07:18.409Z"
     }
   ]
 }
