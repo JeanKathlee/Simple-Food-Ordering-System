@@ -232,28 +232,58 @@ export default function Dashboard() {
     setFilters((current) => ({ ...current, [field]: value }));
   };
 
-  const handleAddMenuItem = (payload) => {
-    const categoryName = categories.find((category) => category.id === payload.categoryId)?.name || "";
-    setMenuItems((current) => [
-      {
-        id: `M-${Date.now().toString().slice(-4)}`,
-        soldCount: 0,
-        category: categoryName,
-        ...payload,
-      },
-      ...current,
-    ]);
-    bumpSyncState("menu");
+  const handleAddMenuItem = async (payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch("/api/menu", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to add menu item");
+        return;
+      }
+
+      const newItem = await response.json();
+      setMenuItems((current) => [newItem, ...current]);
+      bumpSyncState("menu");
+    } catch (err) {
+      alert("Error adding menu item");
+    }
   };
 
-  const handleUpdateMenuItem = (id, payload) => {
-    const categoryName = categories.find((category) => category.id === payload.categoryId)?.name || "";
-    setMenuItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, ...payload, category: categoryName } : item
-      )
-    );
-    bumpSyncState("menu");
+  const handleUpdateMenuItem = async (id, payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch(`/api/menu/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to update menu item");
+        return;
+      }
+
+      const updatedItem = await response.json();
+      setMenuItems((current) =>
+        current.map((item) => (item.id === id ? updatedItem : item))
+      );
+      bumpSyncState("menu");
+    } catch (err) {
+      alert("Error updating menu item");
+    }
   };
 
   const handleDeleteMenuItem = (id) => {
@@ -262,10 +292,29 @@ export default function Dashboard() {
       title: "Delete menu item",
       message: "This action removes the item from the menu list.",
       confirmLabel: "Delete Item",
-      onConfirm: () => {
-        setMenuItems((current) => current.filter((item) => item.id !== id));
-        setModalConfig((current) => ({ ...current, open: false }));
-        bumpSyncState("menu");
+      onConfirm: async () => {
+        try {
+          const session = getAuthSession();
+          const response = await fetch(`/api/menu/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session?.token}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alert(error?.message || "Failed to delete menu item");
+            return;
+          }
+
+          setMenuItems((current) => current.filter((item) => item.id !== id));
+          setModalConfig((current) => ({ ...current, open: false }));
+          bumpSyncState("menu");
+        } catch (err) {
+          alert("Error deleting menu item");
+          setModalConfig((current) => ({ ...current, open: false }));
+        }
       },
     });
   };
