@@ -1,28 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { formatPrice, getMenuItemByName } from "../data/menuItems";
-
-const CART_STORAGE_KEY = "foodjs-cart";
-
-function readCart() {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(CART_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(cartItems) {
-  sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-}
+import { fetchMenuFromBackend, enrichMenuWithImages, formatPrice } from "../data/menuItems";
+import { getAuthSession } from "../lib/auth";
 
 export default function ProductDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const { name } = useParams();
+  const [item, setItem] = useState(location.state?.item || null);
   const [quantity, setQuantity] = useState(1);
   const [choice, setChoice] = useState("Go Regular Iced Tea");
+  const [loading, setLoading] = useState(!item);
 
   const choiceOptions = [
     { label: "Go Large Iced Tea", addOn: 50 },
@@ -30,14 +18,25 @@ export default function ProductDetails() {
     { label: "Go Regular Iced Tea", addOn: 0 },
   ];
 
-  const item = useMemo(() => {
-    if (location.state?.item) {
-      return location.state.item;
-    }
+  useEffect(() => {
+    if (item || !name) return;
 
-    const decodedName = decodeURIComponent(name || "");
-    return getMenuItemByName(decodedName);
-  }, [location.state, name]);
+    const loadItem = async () => {
+      try {
+        const items = await fetchMenuFromBackend();
+        const enhanced = enrichMenuWithImages(items);
+        const decodedName = decodeURIComponent(name);
+        const found = enhanced.find((i) => i.name === decodedName);
+        setItem(found || null);
+      } catch (err) {
+        console.error("Failed to load product:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadItem();
+  }, [name, item]);
 
   if (!item) {
     return (
@@ -54,31 +53,46 @@ export default function ProductDetails() {
   const selectedChoice = choiceOptions.find((option) => option.label === choice) || choiceOptions[2];
   const itemTotal = (item.price + selectedChoice.addOn) * quantity;
 
-  const handleAddToBag = () => {
-    const cartItems = readCart();
-    const existing = cartItems.find((cartItem) => cartItem.name === item.name);
+  const handleAddToBag = async () => {
+    setLoading(true);
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token) {
+        alert("Please log in to add items to cart");
+        setLoading(false);
+        return;
+      }
 
-    const next = existing
-      ? cartItems.map((cartItem) =>
-          cartItem.name === item.name
-            ? {
-                ...cartItem,
-                quantity: cartItem.quantity + quantity,
-                selectedChoice: choice,
-              }
-            : cartItem
-        )
-      : [
-          ...cartItems,
-          {
-            ...item,
-            quantity,
-            selectedChoice: choice,
-          },
-        ];
+      const response = await fetch("/api/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          menuItemId: item.id,
+          name: item.name,
+          price: item.price + selectedChoice.addOn,
+          quantity,
+          selectedChoice: choice,
+        }),
+      });
 
-    writeCart(next);
-    navigate("/menu");
+      if (response.ok) {
+        navigate("/menu");
+      } else {
+        const error = await response.json();
+        console.error("Failed to add to cart:", response.status, error);
+        alert(error?.message || "Failed to add item to cart");
+      }
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      alert("Error adding item to cart: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -148,8 +162,13 @@ export default function ProductDetails() {
                 </button>
               </div>
 
-              <button type="button" className="product-add-bag" onClick={handleAddToBag}>
-                Add To Cart - {formatPrice(itemTotal)}
+              <button 
+                type="button" 
+                className="product-add-bag" 
+                onClick={handleAddToBag}
+                disabled={loading}
+              >
+                {loading ? "Adding..." : `Add To Cart - ${formatPrice(itemTotal)}`}
               </button>
             </div>
           </div>

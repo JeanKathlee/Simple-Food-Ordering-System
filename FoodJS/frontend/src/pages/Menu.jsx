@@ -2,33 +2,62 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { clearAuthSession, getAuthSession } from "../lib/auth";
-import { formatPrice, menuItems, tabs } from "../data/menuItems";
-
-const CART_STORAGE_KEY = "foodjs-cart";
-
-function readCart() {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(CART_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(cartItems) {
-  sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-}
+import {
+  fetchMenuFromBackend,
+  getCategoriesFromMenu,
+  filterMenuByCategory,
+  enrichMenuWithImages,
+  formatPrice,
+} from "../data/menuItems";
 
 export default function Menu() {
   const navigate = useNavigate();
-  const session = useMemo(() => getAuthSession(), []);
+  const [menuItems, setMenuItems] = useState([]);
+  const [tabs, setTabs] = useState(["All"]);
   const [activeTab, setActiveTab] = useState("All");
   const [query, setQuery] = useState("");
-  const [cartItems, setCartItems] = useState(() => readCart());
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load sa menu and cart
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load menu gikan backend
+        const items = await fetchMenuFromBackend();
+        const enhancedItems = enrichMenuWithImages(items);
+        setMenuItems(enhancedItems);
+        
+        const categories = getCategoriesFromMenu(enhancedItems);
+        setTabs(categories);
+
+        // Load cart gikan API
+        const session = getAuthSession();
+        const token = session?.token;
+        if (token) {
+          const cartResponse = await fetch("/api/cart", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (cartResponse.ok) {
+            const cartData = await cartResponse.json();
+            setCartItems(cartData || []);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const visibleItems = useMemo(() => {
-    const tabItems =
-      activeTab === "All" ? menuItems : menuItems.filter((item) => item.category === activeTab);
+    const tabItems = filterMenuByCategory(menuItems, activeTab);
 
     if (!query.trim()) {
       return tabItems;
@@ -37,33 +66,181 @@ export default function Menu() {
     const keyword = query.toLowerCase();
     return tabItems.filter(
       (item) =>
-        item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)
+        item.name.toLowerCase().includes(keyword) ||
+        (item.description && item.description.toLowerCase().includes(keyword))
     );
-  }, [activeTab, query]);
+  }, [activeTab, query, menuItems]);
 
   const handleLogout = () => {
     clearAuthSession();
     navigate("/");
   };
 
-  useEffect(() => {
-    writeCart(cartItems);
-  }, [cartItems]);
+  const addToCart = async (item) => {
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token) {
+        alert("Please log in to add items to cart");
+        return;
+      }
 
-  const adjustQuantity = (name, change) => {
-    setCartItems((previous) =>
-      previous
-        .map((item) => (item.name === name ? { ...item, quantity: item.quantity + change } : item))
-        .filter((item) => item.quantity > 0)
-    );
+      const response = await fetch("/api/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          menuItemId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: 1,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to add to cart:", response.status, error);
+        alert(error?.message || "Failed to add item to cart");
+        return;
+      }
+
+      // Add or update in local state
+      setCartItems((prev) => {
+        const existing = prev.find((cart) => cart.menuItemId === item.id);
+        if (existing) {
+          return prev.map((cart) =>
+            cart.menuItemId === item.id
+              ? { ...cart, quantity: cart.quantity + 1 }
+              : cart
+          );
+        }
+        return [
+          ...prev,
+          {
+            userId: session?.user?.id,
+            menuItemId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: 1,
+            selectedChoice: null,
+          },
+        ];
+      });
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
+      alert("Network error: " + err.message);
+    }
   };
 
-  const removeFromCart = (name) => {
-    setCartItems((previous) => previous.filter((item) => item.name !== name));
+  const adjustQuantity = async (menuItemId, newQuantity) => {
+    if (newQuantity <= 0) {
+      await removeFromCart(menuItemId);
+      return;
+    }
+
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token) {
+        alert("Please log in to update cart");
+        return;
+      }
+
+      const response = await fetch(`/api/cart/items/${menuItemId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ quantity: newQuantity }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to update cart:", response.status, error);
+        alert(error?.message || "Failed to update cart item");
+        return;
+      }
+
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.menuItemId === menuItemId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update cart:", err);
+      alert("Network error: " + err.message);
+    }
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const removeFromCart = async (menuItemId) => {
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token) {
+        alert("Please log in to remove items from cart");
+        return;
+      }
+
+      const response = await fetch(`/api/cart/items/${menuItemId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to remove from cart:", response.status, error);
+        alert(error?.message || "Failed to remove from cart");
+        return;
+      }
+
+      setCartItems((prev) =>
+        prev.filter((item) => item.menuItemId !== menuItemId)
+      );
+    } catch (err) {
+      console.error("Failed to remove from cart:", err);
+      alert("Network error: " + err.message);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token) {
+        alert("Please log in to clear cart");
+        return;
+      }
+
+      const response = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to clear cart:", response.status, error);
+        alert(error?.message || "Failed to clear cart");
+        return;
+      }
+
+      setCartItems([]);
+    } catch (err) {
+      console.error("Failed to clear cart:", err);
+      alert("Network error: " + err.message);
+    }
   };
 
   const cartCount = useMemo(
@@ -91,7 +268,7 @@ export default function Menu() {
           </div>
 
           <div className="customer-home-actions">
-            <span className="customer-home-user">Hi, {session?.name || "Customer"}</span>
+            <span className="customer-home-user">Hi, {getAuthSession()?.user?.name || "Customer"}</span>
             <button type="button" className="customer-home-logout" onClick={handleLogout}>
               Logout
             </button>
@@ -190,18 +367,18 @@ export default function Menu() {
 
           <div className="my-bag-list">
             {cartItems.map((item) => (
-              <article key={item.name} className="my-bag-item">
+              <article key={item.menuItemId} className="my-bag-item">
                 <h3>{item.name}</h3>
                 <p>{formatPrice(item.price * item.quantity)}</p>
                 <div className="my-bag-item-actions">
-                  <button type="button" onClick={() => adjustQuantity(item.name, -1)}>
+                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
                     −
                   </button>
                   <span>{item.quantity}</span>
-                  <button type="button" onClick={() => adjustQuantity(item.name, 1)}>
+                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
                     +
                   </button>
-                  <button type="button" className="remove" onClick={() => removeFromCart(item.name)}>
+                  <button type="button" className="remove" onClick={() => removeFromCart(item.menuItemId)}>
                     Remove
                   </button>
                 </div>

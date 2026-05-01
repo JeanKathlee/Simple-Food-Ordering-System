@@ -8,18 +8,17 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
-// Helper: generate next user ID
+// Generate ID sa user
 function getNextUserId() {
   const data = readJsonFromData('users.json');
   const maxId = Math.max(...(data.users || []).map(u => u.id), 0);
   return maxId + 1;
 }
 
-// POST /api/users/register - Create a new user account
+// POST method, Create new user account
 router.post('/register', async (req, res) => {
   const { email, password, name } = req.body || {};
 
-  // Validate input
   if (!email || !password || !name) {
     return res.status(400).json({ message: 'Email, password, and name are required.' });
   }
@@ -28,10 +27,8 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ message: 'Password must be at least 6 characters.' });
   }
 
-  // Read current users
   const data = readJsonFromData('users.json');
   
-  // Check if email already exists
   const existingUser = (data.users || []).find(
     (user) => String(user.email).toLowerCase() === String(email).toLowerCase()
   );
@@ -40,33 +37,28 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ message: 'Email already in use.' });
   }
 
-  // Hash password
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // Create new user object
   const newUser = {
     id: getNextUserId(),
     name,
     email,
     passwordHash,
-    role: 'customer', // New users are always customers
+    role: 'customer',
     createdAt: new Date().toISOString(),
   };
 
-  // Add to users array
   data.users.push(newUser);
 
-  // Save back to file
+  // Save sa json database
   writeJsonToData('users.json', data);
 
-  // Generate token
   const token = jwt.sign(
     { sub: newUser.id, email: newUser.email, role: newUser.role },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
 
-  // Return response (without password hash)
   return res.status(201).json({
     message: 'Account created successfully.',
     token,
@@ -79,7 +71,7 @@ router.post('/register', async (req, res) => {
   });
 });
 
-// POST /api/users/login - Authenticate user and return token
+// POST method, authenticate user
 router.post('/login', async (req, res) => {
   const { email, password } = req.body || {};
 

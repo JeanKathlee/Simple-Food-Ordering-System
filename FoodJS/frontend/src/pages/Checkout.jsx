@@ -1,23 +1,41 @@
-import { useMemo, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "../data/menuItems";
-
-const CART_STORAGE_KEY = "foodjs-cart";
-
-function readCart() {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(CART_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+import { getAuthSession } from "../lib/auth";
 
 export default function Checkout() {
   const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [couponCode, setCouponCode] = useState("");
-  const cartItems = useMemo(() => readCart(), []);
+
+  // Load cart gikan API
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const session = getAuthSession();
+        const token = session?.token;
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch("/api/cart", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCartItems(data || []);
+        }
+      } catch (err) {
+        console.error("Failed to load cart:", err);
+      }
+    };
+
+    loadCart();
+  }, []);
 
   const subtotal = useMemo(
     () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
@@ -27,7 +45,6 @@ export default function Checkout() {
   const total = subtotal;
 
   function handlePlaceOrder() {
-    // Clear any previous order ID so OrderTracking generates a fresh one
     sessionStorage.removeItem("foodjs-order-id");
     navigate("/order-tracking");
   }
