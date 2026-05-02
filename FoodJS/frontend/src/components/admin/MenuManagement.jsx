@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 
 const EMPTY_FORM = {
   name: "",
@@ -6,6 +6,8 @@ const EMPTY_FORM = {
   price: "",
   prepTime: "",
   isAvailable: true,
+  image: null,
+  imagePreview: null,
 };
 
 function formatCurrency(value) {
@@ -28,6 +30,7 @@ export default function MenuManagement({
     categoryId: categories[0]?.id || "",
   });
   const [editId, setEditId] = useState(null);
+  const fileInputRef = useRef(null);
 
   const groupedItems = useMemo(() => {
     return categories.map((category) => ({
@@ -40,12 +43,30 @@ export default function MenuManagement({
     setForm((current) => ({ ...current, [field]: value }));
   };
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((current) => ({
+        ...current,
+        image: reader.result,
+        imagePreview: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const resetForm = () => {
     setEditId(null);
     setForm({
       ...EMPTY_FORM,
       categoryId: categories[0]?.id || "",
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const submitForm = (event) => {
@@ -56,6 +77,7 @@ export default function MenuManagement({
       price: Number(form.price),
       prepTime: Number(form.prepTime),
       isAvailable: form.isAvailable,
+      image: form.image || undefined,
     };
 
     if (!payload.name || !payload.categoryId || payload.price <= 0 || payload.prepTime <= 0) {
@@ -79,6 +101,8 @@ export default function MenuManagement({
       price: String(item.price),
       prepTime: String(item.prepTime),
       isAvailable: item.isAvailable,
+      image: item.image || null,
+      imagePreview: item.image || null,
     });
   };
 
@@ -122,6 +146,21 @@ export default function MenuManagement({
           value={form.prepTime}
           onChange={(event) => handleInput("prepTime", event.target.value)}
         />
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          ref={fileInputRef}
+        />
+
+        {form.imagePreview && (
+          <img
+            src={form.imagePreview}
+            alt="Preview"
+            style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "4px" }}
+          />
+        )}
 
         <label className="admin-checkbox-row">
           <input
