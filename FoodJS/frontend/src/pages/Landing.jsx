@@ -1,5 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+
+function handleMenuClick(e, navigate) {
+  e.preventDefault();
+  navigate("/login");
+}
 
 const categories = [
   {
@@ -77,6 +82,8 @@ const bestSellers = [
 ];
 
 export default function Landing() {
+  const navigate = useNavigate();
+
   return (
     <div className="landing-page">
       <header className="landing-header">
@@ -139,7 +146,15 @@ export default function Landing() {
           </div>
           <div className="feature-grid">
             {featuredMenu.map((item) => (
-              <article key={item.name} className="feature-card">
+              <article
+                key={item.name}
+                className="feature-card"
+                onClick={(e) => handleMenuClick(e, navigate)}
+                style={{ cursor: "pointer" }}
+                role="button"
+                tabIndex="0"
+                onKeyDown={(e) => e.key === "Enter" && handleMenuClick(e, navigate)}
+              >
                 <img src={item.image} alt={item.name} />
                 <div>
                   <h4>{item.name}</h4>
@@ -157,7 +172,15 @@ export default function Landing() {
           </div>
           <div className="category-grid">
             {categories.map((category) => (
-              <article key={category.name} className="category-card">
+              <article
+                key={category.name}
+                className="category-card"
+                onClick={(e) => handleMenuClick(e, navigate)}
+                style={{ cursor: "pointer" }}
+                role="button"
+                tabIndex="0"
+                onKeyDown={(e) => e.key === "Enter" && handleMenuClick(e, navigate)}
+              >
                 <img src={category.image} alt={category.name} />
                 <div>
                   <h4>{category.name}</h4>
@@ -175,7 +198,15 @@ export default function Landing() {
           </div>
           <div className="best-seller-grid">
             {bestSellers.map((item) => (
-              <article key={item.name} className="best-seller-card">
+              <article
+                key={item.name}
+                className="best-seller-card"
+                onClick={(e) => handleMenuClick(e, navigate)}
+                style={{ cursor: "pointer" }}
+                role="button"
+                tabIndex="0"
+                onKeyDown={(e) => e.key === "Enter" && handleMenuClick(e, navigate)}
+              >
                 <img src={item.image} alt={item.name} />
                 <div className="best-seller-content">
                   <span>{item.tag}</span>

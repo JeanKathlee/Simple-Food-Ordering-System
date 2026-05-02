@@ -150,16 +150,6 @@ export default function OrderTracking() {
               </div>
             </article>
           </div>
-
-          <article className="tracking-card-box tracking-notif-box">
-            <p>IN-APP NOTIFICATIONS</p>
-            <ul>
-              <li>{orderId} is now Delivered</li>
-              <li>{orderId} is now Preparing</li>
-              <li>{orderId} is now On the way</li>
-              <li>Small and SMS notifications are backend managed.</li>
-            </ul>
-          </article>
         </section>
 
         <section className="tracking-column-status">
@@ -202,6 +192,16 @@ export default function OrderTracking() {
                 </div>
               </div>
             </div>
+          </article>
+
+          <article className="tracking-card-box tracking-notif-box">
+            <p>IN-APP NOTIFICATIONS</p>
+            <ul>
+              <li>{orderId} is now Delivered</li>
+              <li>{orderId} is now Preparing</li>
+              <li>{orderId} is now On the way</li>
+              <li>Small and SMS notifications are backend managed.</li>
+            </ul>
           </article>
         </section>
 
