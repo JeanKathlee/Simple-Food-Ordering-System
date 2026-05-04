@@ -77,4 +77,50 @@ router.post('/', verifyToken, (req, res) => {
   res.status(201).json(newOrder);
 });
 
+// PATCH - Cancel order paras pending or preparing orders only
+router.patch('/:id/cancel', verifyToken, (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.sub;
+  const data = readJsonFromData('orders.json');
+  
+  const order = (data.orders || []).find(o => o.id === id && o.userId === userId);
+  
+  if (!order) {
+    return res.status(404).json({ message: 'Order not found.' });
+  }
+  
+  if (order.status === 'Delivered' || order.status === 'Cancelled') {
+    return res.status(400).json({ message: `Cannot cancel order with status: ${order.status}` });
+  }
+  
+  order.status = 'Cancelled';
+  order.updatedAt = new Date().toISOString();
+  
+  writeJsonToData('orders.json', data);
+  res.json(order);
+});
+
+// PATCH - Update order status para admin only
+router.patch('/:id/status', verifyToken, (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const data = readJsonFromData('orders.json');
+  
+  const order = (data.orders || []).find(o => o.id === id);
+  
+  if (!order) {
+    return res.status(404).json({ message: 'Order not found.' });
+  }
+  
+  if (!status) {
+    return res.status(400).json({ message: 'Status is required.' });
+  }
+  
+  order.status = status;
+  order.updatedAt = new Date().toISOString();
+  
+  writeJsonToData('orders.json', data);
+  res.json(order);
+});
+
 module.exports = router;

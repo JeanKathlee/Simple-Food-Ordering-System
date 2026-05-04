@@ -9,37 +9,71 @@ export default function OrderTracking() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadOrder = async () => {
-      try {
-        const session = getAuthSession();
-        const token = session?.token;
-        
-        if (!token || !orderId) {
-          navigate("/menu");
-          return;
-        }
-
-        const response = await fetch(`/api/orders/${orderId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setOrder(data);
-        } else {
-          navigate("/menu");
-        }
-      } catch (err) {
-        console.error("Failed to load order:", err);
-      } finally {
-        setLoading(false);
+  const loadOrder = async () => {
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+      
+      if (!token || !orderId) {
+        navigate("/menu");
+        return;
       }
-    };
 
+      const response = await fetch(`/api/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setOrder(data);
+      } else {
+        navigate("/menu");
+      }
+    } catch (err) {
+      console.error("Failed to load order:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadOrder();
+    
+    // matic update every5 seconds
+    const interval = setInterval(loadOrder, 5000);
+    
+    return () => clearInterval(interval);
   }, [orderId, navigate]);
 
+  const handleCancelOrder = async () => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) {
+      return;
+    }
+
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+
+      const response = await fetch(`/api/orders/${orderId}/cancel`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setOrder(updated);
+        alert("Order cancelled successfully");
+      } else {
+        const error = await response.json();
+        alert(error.message || "Failed to cancel order");
+      }
+    } catch (err) {
+      console.error("Error cancelling order:", err);
+      alert("Error: " + err.message);
+    }
+  };
+
+  const canCancel = order && (order.status === "Pending" || order.status === "Preparing");
   const statusSteps = ["Pending", "Preparing", "Ready", "Delivered"];
   const currentStatusIndex = statusSteps.indexOf(order?.status || "Pending");
 
@@ -160,6 +194,25 @@ export default function OrderTracking() {
           <span>{formatPrice(order.total)}</span>
         </div>
       </div>
+
+      {canCancel && (
+        <button
+          onClick={handleCancelOrder}
+          style={{
+            width: "100%",
+            padding: "12px",
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            fontSize: "16px",
+            cursor: "pointer",
+            marginBottom: "10px",
+          }}
+        >
+          Cancel Order
+        </button>
+      )}
 
       <button
         onClick={() => navigate("/order-history")}
