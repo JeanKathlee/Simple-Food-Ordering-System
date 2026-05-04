@@ -5,8 +5,11 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Menu from "./pages/Menu";
 import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderHistory from "./pages/OrderHistory";
 import { getUserRole, isAuthenticated } from "./lib/auth";
 
 function AdminRoute({ children }) {
@@ -57,6 +60,14 @@ export default function App() {
           }
         />
         <Route
+          path="/cart"
+          element={
+            <CustomerRoute>
+              <Cart />
+            </CustomerRoute>
+          }
+        />
+        <Route
           path="/checkout"
           element={
             <CustomerRoute>
@@ -73,10 +84,26 @@ export default function App() {
           }
         />
         <Route
-          path="/order-tracking"
+          path="/order-tracking/:orderId"
           element={
             <CustomerRoute>
               <OrderTracking />
+            </CustomerRoute>
+          }
+        />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={
+            <CustomerRoute>
+              <OrderConfirmation />
+            </CustomerRoute>
+          }
+        />
+        <Route
+          path="/order-history"
+          element={
+            <CustomerRoute>
+              <OrderHistory />
             </CustomerRoute>
           }
         />

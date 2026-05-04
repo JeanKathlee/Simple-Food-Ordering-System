@@ -8,10 +8,17 @@ export default function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [couponCode, setCouponCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    mobileNumber: "",
+    address: "",
+  });
 
   // Load cart gikan API
   useEffect(() => {
-    const loadCart = async () => {
+    const loadData = async () => {
       try {
         const session = getAuthSession();
         const token = session?.token;
@@ -19,23 +26,41 @@ export default function Checkout() {
           return;
         }
 
-        const response = await fetch("/api/cart", {
+        const cartResponse = await fetch("/api/cart", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        if (cartResponse.ok) {
+          const data = await cartResponse.json();
           setCartItems(data || []);
         }
+
+        // input form gamit user data
+        if (session?.user) {
+          const names = session.user.name.split(" ");
+          setFormData((prev) => ({
+            ...prev,
+            firstName: names[0] || "",
+            lastName: names.slice(1).join(" ") || "",
+          }));
+        }
       } catch (err) {
-        console.error("Failed to load cart:", err);
+        console.error("Failed to load data:", err);
       }
     };
 
-    loadCart();
+    loadData();
   }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const subtotal = useMemo(
     () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
@@ -44,9 +69,71 @@ export default function Checkout() {
 
   const total = subtotal;
 
-  function handlePlaceOrder() {
-    sessionStorage.removeItem("foodjs-order-id");
-    navigate("/order-tracking");
+  async function handlePlaceOrder() {
+    if (cartItems.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    if (!formData.firstName || !formData.lastName || !formData.mobileNumber || !formData.address) {
+      alert("Please fill in all contact details");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+
+      if (!token) {
+        alert("Please log in to place an order");
+        navigate("/login");
+        return;
+      }
+
+      const customerFullName = `${formData.firstName} ${formData.lastName}`;
+
+      // Create order
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          customerName: customerFullName,
+          paymentMethod,
+        }),
+      });
+
+      if (response.ok) {
+        const order = await response.json();
+
+        await fetch("/api/cart", {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setFormData({
+          firstName: "",
+          lastName: "",
+          mobileNumber: "",
+          address: "",
+        });
+        setCouponCode("");
+
+        navigate(`/order-confirmation/${order.id}`);
+      } else {
+        const error = await response.json();
+        alert(error.message || "Failed to place order");
+      }
+    } catch (err) {
+      console.error("Error placing order:", err);
+      alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -66,23 +153,40 @@ export default function Checkout() {
             <div className="checkout-name-row">
               <label>
                 <span>First Name</span>
-                <input value="Juan" readOnly />
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your first name"
+                />
               </label>
               <label>
                 <span>Last Name</span>
-                <input value="Dela Cruz" readOnly />
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your last name"
+                />
               </label>
             </div>
 
             <label className="checkout-single-input">
               <span>Mobile Number</span>
-              <input value="+63 931845632" readOnly />
+              <input
+                type="tel"
+                name="mobileNumber"
+                value={formData.mobileNumber}
+                onChange={handleInputChange}
+                placeholder="Enter your mobile number"
+              />
             </label>
           </article>
 
           <article className="checkout-card">
-            <h2>Pick-up (Friday, 12:34 am)</h2>
-            <p className="checkout-muted">Pick-up at McDonald's Cebu Northroad</p>
+            <h2>Delivery Address</h2>
 
             <p className="checkout-field-label">Payment Method</p>
             <div className="checkout-payment-row">
@@ -92,21 +196,27 @@ export default function Checkout() {
                 onClick={() => setPaymentMethod("cash")}
               >
                 <strong>Cash</strong>
-                <span>Pay on pick-up</span>
+                <span>Pay on delivery</span>
               </button>
 
               <button
                 type="button"
-                className={`checkout-payment ${paymentMethod === "debit" ? "active" : ""}`}
-                onClick={() => setPaymentMethod("debit")}
+                className={`checkout-payment ${paymentMethod === "card" ? "active" : ""}`}
+                onClick={() => setPaymentMethod("card")}
               >
-                <strong>Debit Card</strong>
-                <span>**** 1234</span>
+                <strong>Credit Card</strong>
+                <span>Online payment</span>
               </button>
             </div>
 
             <p className="checkout-field-label">Address</p>
-            <textarea className="checkout-address" value="Colon, Cebu City" readOnly />
+            <textarea
+              className="checkout-address"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              placeholder="Enter your delivery address"
+            />
 
             <p className="checkout-field-label">Discount / Coupon</p>
             <div className="checkout-coupon-row">
@@ -123,8 +233,8 @@ export default function Checkout() {
                 <span>Total</span>
                 <strong>{formatPrice(total)}</strong>
               </div>
-              <button type="button" disabled={!cartItems.length} onClick={handlePlaceOrder}>
-                Place Order
+              <button type="button" disabled={!cartItems.length || loading} onClick={handlePlaceOrder}>
+                {loading ? "Placing Order..." : "Place Order"}
               </button>
             </div>
           </article>

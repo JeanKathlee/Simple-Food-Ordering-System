@@ -269,6 +269,12 @@ export default function Menu() {
 
           <div className="customer-home-actions">
             <span className="customer-home-user">Hi, {getAuthSession()?.user?.name || "Customer"}</span>
+            <button type="button" className="customer-home-logout" onClick={() => navigate("/cart")}>
+              My Cart ({cartCount})
+            </button>
+            <button type="button" className="customer-home-logout" onClick={() => navigate("/order-history")}>
+              My Orders
+            </button>
             <button type="button" className="customer-home-logout" onClick={handleLogout}>
               Logout
             </button>
@@ -395,7 +401,7 @@ export default function Menu() {
               <span>Total</span>
               <strong>{formatPrice(subtotal)}</strong>
             </div>
-            <button type="button" disabled={!cartItems.length} onClick={() => navigate("/checkout")}>
+            <button type="button" disabled={!cartItems.length} onClick={() => navigate("/cart")}>
               Proceed to Checkout
             </button>
           </div>

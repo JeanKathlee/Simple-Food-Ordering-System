@@ -1,241 +1,181 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatPrice } from "../data/menuItems";
-
-const CART_STORAGE_KEY = "foodjs-cart";
-
-function readCart() {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(CART_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+import { getAuthSession } from "../lib/auth";
 
 export default function OrderTracking() {
   const navigate = useNavigate();
-  const cartItems = useMemo(() => {
-    const stored = readCart();
-    if (stored.length) {
-      return stored;
-    }
+  const { orderId } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    return [
-      {
-        name: "Family Feast Combo",
-        quantity: 1,
-        price: 999,
-        selectedChoice: "Pomegranate Cooler McFloat Medium",
-      },
-      {
-        name: "Cheese Burger",
-        quantity: 1,
-        price: 129,
-        selectedChoice: "Pomegranate Cooler McFloat Medium",
-      },
-    ];
-  }, []);
+  useEffect(() => {
+    const loadOrder = async () => {
+      try {
+        const session = getAuthSession();
+        const token = session?.token;
+        
+        if (!token || !orderId) {
+          navigate("/menu");
+          return;
+        }
 
-  const subtotal = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    [cartItems]
-  );
+        const response = await fetch(`/api/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  const orderId = useMemo(() => {
-    const existing = sessionStorage.getItem("foodjs-order-id");
-    if (existing) {
-      return existing;
-    }
+        if (response.ok) {
+          const data = await response.json();
+          setOrder(data);
+        } else {
+          navigate("/menu");
+        }
+      } catch (err) {
+        console.error("Failed to load order:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const generated = `#${Date.now()}`;
-    sessionStorage.setItem("foodjs-order-id", generated);
-    return generated;
-  }, []);
+    loadOrder();
+  }, [orderId, navigate]);
 
-  const historyItems = [
-    { id: "#1777038239767", date: "4/24/2026, 9:45:30 PM", status: "Preparing", total: 1147 },
-    { id: "#1777025146443", date: "4/24/2026, 6:05:16 PM", status: "On the way", total: 848 },
-    { id: "#1777024895278", date: "4/24/2026, 6:01:34 PM", status: "On the way", total: 2245 },
-    { id: "#1776956077785", date: "4/23/2026, 10:54:32 PM", status: "Delivered", total: 2815 },
-    { id: "#1776584905231", date: "4/19/2026, 8:42:15 PM", status: "Delivered", total: 2586 },
-  ];
+  const statusSteps = ["Pending", "Preparing", "Ready", "Delivered"];
+  const currentStatusIndex = statusSteps.indexOf(order?.status || "Pending");
+
+  if (loading) {
+    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+  }
+
+  if (!order) {
+    return <div style={{ textAlign: "center", padding: "50px" }}>Order not found</div>;
+  }
 
   return (
-    <div className="tracking-detailed-page">
-      <div className="tracking-detailed-topbar">
-        <span>Order Confirmation</span>
-        <button type="button" onClick={() => navigate(-1)}>
-          Back
+    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "30px" }}>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <button
+          onClick={() => navigate("/menu")}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#f5f5f5",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          ← Back
+        </button>
+        <button
+          onClick={() => navigate("/menu")}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#f5f5f5",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          Home
         </button>
       </div>
+      <h1>Order Tracking</h1>
+      <p><strong>Order ID:</strong> {order.id}</p>
 
-      <div className="tracking-detailed-confirm">
-        <h1>Order Confirmation</h1>
-        <p>Your order was placed successfully. Order {orderId} is now in progress.</p>
+      <div style={{ marginBottom: "30px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+          {statusSteps.map((step, index) => (
+            <div key={step} style={{ textAlign: "center", flex: 1 }}>
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  margin: "0 auto 8px",
+                  backgroundColor: index <= currentStatusIndex ? "#4caf50" : "#ddd",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {index <= currentStatusIndex ? "✓" : index + 1}
+              </div>
+              <p style={{ fontSize: "12px", margin: "0", fontWeight: index === currentStatusIndex ? "bold" : "normal" }}>
+                {step}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            height: "3px",
+            backgroundColor: "#ddd",
+            position: "relative",
+            marginTop: "-25px",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              backgroundColor: "#4caf50",
+              width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%`,
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
       </div>
 
-      <div className="tracking-detailed-grid">
-        <section className="tracking-column-main">
-          <article className="tracking-card-box">
-            <div className="tracking-title-row">
-              <div>
-                <p>DELIVERY MAP</p>
-                <h2>Colon, Cebu City</h2>
-              </div>
-              <span>In Kitchen</span>
+      <div style={{ backgroundColor: "#e3f2fd", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
+        <h3 style={{ margin: "0 0 5px 0" }}>Current Status</h3>
+        <p style={{ margin: "0", fontSize: "18px", color: "#1976d2" }}>{order.status}</p>
+      </div>
+
+      <div style={{ backgroundColor: "#f5f5f5", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
+        <h3>Order Details</h3>
+        <p><strong>Customer:</strong> {order.customerName}</p>
+        <p><strong>Payment:</strong> {order.paymentMethod}</p>
+        <p><strong>Placed:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Items</h3>
+        {order.items.map((item) => (
+          <div key={item.menuItemId} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ddd" }}>
+            <div>
+              <strong>{item.name}</strong>
+              <p style={{ fontSize: "12px", color: "#666", margin: "3px 0" }}>Qty: {item.quantity}</p>
             </div>
-
-            <iframe
-              title="delivery-map"
-              src="https://www.google.com/maps?q=Colon,Cebu,Philippines&z=14&output=embed"
-              className="tracking-map-frame"
-              loading="lazy"
-            />
-          </article>
-
-          <div className="tracking-main-bottom">
-            <article className="tracking-card-box">
-              <div className="tracking-title-row simple">
-                <div>
-                  <p>ORDER DETAILS</p>
-                  <h2>Order {orderId}</h2>
-                </div>
-                <span>{cartItems.reduce((sum, item) => sum + item.quantity, 0)} items</span>
-              </div>
-
-              <div className="tracking-order-table">
-                <div className="tracking-order-row head">
-                  <span>Item</span>
-                  <span>Qty</span>
-                  <span>Price</span>
-                </div>
-
-                {cartItems.map((item) => (
-                  <div key={item.name} className="tracking-order-row">
-                    <span>{item.name}</span>
-                    <span>{item.quantity}</span>
-                    <span>{formatPrice(item.price * item.quantity)}</span>
-                  </div>
-                ))}
-
-                <div className="tracking-order-row total">
-                  <span>Total</span>
-                  <span />
-                  <span>{formatPrice(subtotal)}</span>
-                </div>
-              </div>
-
-              <button type="button" className="tracking-cancel-btn" disabled>
-                Cancel Order
-              </button>
-            </article>
-
-            <article className="tracking-delivery-panel">
-              <p>DELIVERY INFO</p>
-
-              <div>
-                <h4>ADDRESS</h4>
-                <strong>Colon, Cebu City</strong>
-              </div>
-
-              <div>
-                <h4>DRIVER</h4>
-                <strong>Juan Dela Cruz</strong>
-              </div>
-
-              <div>
-                <h4>ETA</h4>
-                <strong>12 - 15 minutes</strong>
-              </div>
-            </article>
+            <div>{formatPrice(item.price * item.quantity)}</div>
           </div>
-        </section>
-
-        <section className="tracking-column-status">
-          <article className="tracking-card-box">
-            <div className="tracking-title-row">
-              <div>
-                <p>STATUS TIMELINE</p>
-                <h2>Current progress</h2>
-              </div>
-              <span>In Kitchen</span>
-            </div>
-
-            <div className="tracking-steps">
-              <div className="tracking-step active">
-                <div className="dot" />
-                <div>
-                  <h3>Restaurant</h3>
-                  <p>Order received</p>
-                </div>
-              </div>
-              <div className="tracking-step active">
-                <div className="dot" />
-                <div>
-                  <h3>Processing</h3>
-                  <p>Preparing your food</p>
-                </div>
-              </div>
-              <div className="tracking-step">
-                <div className="dot" />
-                <div>
-                  <h3>On the way</h3>
-                  <p>Rider is heading to you</p>
-                </div>
-              </div>
-              <div className="tracking-step">
-                <div className="dot" />
-                <div>
-                  <h3>Delivered</h3>
-                  <p>Completed</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article className="tracking-card-box tracking-notif-box">
-            <p>IN-APP NOTIFICATIONS</p>
-            <ul>
-              <li>{orderId} is now Delivered</li>
-              <li>{orderId} is now Preparing</li>
-              <li>{orderId} is now On the way</li>
-              <li>Small and SMS notifications are backend managed.</li>
-            </ul>
-          </article>
-        </section>
-
-        <aside className="tracking-column-history">
-          <article className="tracking-card-box">
-            <p>ORDER HISTORY</p>
-            <h2>Past orders</h2>
-
-            <input placeholder="Search Order ID" />
-            <select defaultValue="All Status">
-              <option>All Status</option>
-              <option>Preparing</option>
-              <option>On the way</option>
-              <option>Delivered</option>
-            </select>
-            <input placeholder="mm/dd/yyyy" />
-
-            <div className="tracking-history-list">
-              {historyItems.map((entry) => (
-                <div className="tracking-history-item" key={entry.id}>
-                  <div>
-                    <h3>Order {entry.id}</h3>
-                    <p>{entry.date}</p>
-                  </div>
-                  <div>
-                    <p>{entry.status}</p>
-                    <strong>{formatPrice(entry.total)}</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </article>
-        </aside>
+        ))}
       </div>
+
+      <div style={{ backgroundColor: "#fff9c4", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "18px", fontWeight: "bold" }}>
+          <span>Total:</span>
+          <span>{formatPrice(order.total)}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => navigate("/order-history")}
+        style={{
+          width: "100%",
+          padding: "12px",
+          backgroundColor: "#757575",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          fontSize: "16px",
+          cursor: "pointer",
+        }}
+      >
+        View All Orders
+      </button>
     </div>
   );
 }
