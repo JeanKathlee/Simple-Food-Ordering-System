@@ -2,6 +2,7 @@ import { useMemo, useState, useRef } from "react";
 
 const EMPTY_FORM = {
   name: "",
+  description: "",
   categoryId: "",
   price: "",
   prepTime: "",
@@ -73,6 +74,7 @@ export default function MenuManagement({
     event.preventDefault();
     const payload = {
       name: form.name.trim(),
+      description: form.description.trim(),
       categoryId: form.categoryId,
       price: Number(form.price),
       prepTime: Number(form.prepTime),
@@ -97,6 +99,7 @@ export default function MenuManagement({
     setEditId(item.id);
     setForm({
       name: item.name,
+      description: item.description || "",
       categoryId: item.categoryId,
       price: String(item.price),
       prepTime: String(item.prepTime),
@@ -118,6 +121,13 @@ export default function MenuManagement({
           placeholder="Menu item name"
           value={form.name}
           onChange={(event) => handleInput("name", event.target.value)}
+        />
+
+        <textarea
+          placeholder="Item description"
+          value={form.description}
+          onChange={(event) => handleInput("description", event.target.value)}
+          style={{ minHeight: "80px", fontFamily: "inherit", padding: "8px" }}
         />
 
         <select

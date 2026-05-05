@@ -249,40 +249,27 @@ export default function Dashboard() {
   }, [filters, allOrders]);
 
   const dashboardStats = useMemo(() => {
-    const today = new Date();
-    const isToday = (value) => {
-      const date = new Date(value);
-      return (
-        date.getFullYear() === today.getFullYear() &&
-        date.getMonth() === today.getMonth() &&
-        date.getDate() === today.getDate()
-      );
-    };
-
-    const todayOrders = orders.filter((order) => isToday(order.createdAt));
-    const completedOrders = orders.filter((order) => order.status === "Completed").length;
-    const cancelledOrders = orders.filter((order) => order.status === "Cancelled").length;
-    const pendingOrders = orders.filter((order) => order.status === "Pending").length;
-    const revenueToday = todayOrders.reduce((sum, order) => {
-      if (order.status === "Cancelled") {
-        return sum;
-      }
+    const statsData = filteredAdminOrders;
+    
+    const completedOrders = statsData.filter((order) => order.status === "Delivered").length;
+    const cancelledOrders = statsData.filter((order) => order.status === "Cancelled").length;
+    const pendingOrders = statsData.filter((order) => order.status === "Pending").length;
+    const preparingOrders = statsData.filter((order) => order.status === "Preparing").length;
+    
+    const revenueTotal = statsData.reduce((sum, order) => {
+      if (order.status === "Cancelled") return sum;
       return sum + order.total;
     }, 0);
 
-    const weeklyCurrent = weeklyRevenue.reduce((sum, day) => sum + Number(day.amount || 0), 0);
-    const weeklyPrevious = Math.round(weeklyCurrent * 0.91);
-    const weeklyTrend = Math.round(((weeklyCurrent - weeklyPrevious) / weeklyPrevious) * 100);
-
     return {
-      totalOrdersToday: todayOrders.length,
-      revenueToday,
+      totalOrdersFiltered: statsData.length,
+      revenueFiltered: revenueTotal,
       completedOrders,
       cancelledOrders,
       pendingOrders,
-      weeklyTrend,
+      preparingOrders,
     };
-  }, [orders, weeklyRevenue]);
+  }, [filteredAdminOrders]);
 
   const topItems = useMemo(() => {
     return [...menuItems].sort((a, b) => b.soldCount - a.soldCount).slice(0, 5);

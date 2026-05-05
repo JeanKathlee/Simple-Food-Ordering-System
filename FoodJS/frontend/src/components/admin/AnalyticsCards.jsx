@@ -10,21 +10,21 @@ export default function AnalyticsCards({ stats, topItems }) {
   return (
     <section className="admin-analytics-grid">
       <article className="admin-stat-card">
-        <p>Total Orders Today</p>
-        <h3>{stats.totalOrdersToday}</h3>
-        <span>{stats.pendingOrders} pending now</span>
+        <p>Total Orders (Filtered)</p>
+        <h3>{stats.totalOrdersFiltered}</h3>
+        <span>{stats.preparingOrders} preparing</span>
       </article>
 
       <article className="admin-stat-card">
-        <p>Revenue Today</p>
-        <h3>{formatCurrency(stats.revenueToday)}</h3>
-        <span>{stats.weeklyTrend}% vs last week</span>
+        <p>Revenue (Filtered)</p>
+        <h3>{formatCurrency(stats.revenueFiltered)}</h3>
+        <span>{stats.cancelledOrders} cancelled</span>
       </article>
 
       <article className="admin-stat-card">
         <p>Completed Orders</p>
         <h3>{stats.completedOrders}</h3>
-        <span>{stats.cancelledOrders} cancelled</span>
+        <span>{stats.pendingOrders} pending</span>
       </article>
 
       <article className="admin-stat-card">

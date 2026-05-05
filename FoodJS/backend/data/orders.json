@@ -20,10 +20,10 @@
       ],
       "itemCount": 3,
       "total": 447,
-      "status": "Pending",
+      "status": "Delivered",
       "archived": false,
       "createdAt": "2026-04-22T15:46:15.446Z",
-      "updatedAt": "2026-05-05T01:03:01.517Z"
+      "updatedAt": "2026-05-05T03:18:01.537Z"
     },
     {
       "id": "O-1002",
@@ -45,10 +45,10 @@
       ],
       "itemCount": 3,
       "total": 267,
-      "status": "Preparing",
+      "status": "Cancelled",
       "archived": false,
       "createdAt": "2026-04-29T15:46:15.446Z",
-      "updatedAt": "2026-05-05T01:10:02.733Z"
+      "updatedAt": "2026-05-05T12:49:50.851Z"
     },
     {
       "id": "O-1003",
@@ -172,9 +172,9 @@
       ],
       "total": 129,
       "paymentMethod": "cash",
-      "status": "Ready",
+      "status": "Cancelled",
       "createdAt": "2026-05-04T14:06:11.701Z",
-      "updatedAt": "2026-05-05T01:03:25.099Z"
+      "updatedAt": "2026-05-05T03:18:19.860Z"
     }
   ]
 }
