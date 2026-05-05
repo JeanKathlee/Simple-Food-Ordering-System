@@ -53,6 +53,8 @@ export default function ProductDetails() {
   const selectedChoice = choiceOptions.find((option) => option.label === choice) || choiceOptions[2];
   const itemTotal = (item.price + selectedChoice.addOn) * quantity;
 
+  const description = item.description || "No description available";
+
   const handleAddToBag = async () => {
     setLoading(true);
     try {
@@ -128,6 +130,10 @@ export default function ProductDetails() {
               <h3>{item.name}</h3>
               <strong>{formatPrice(item.price)}</strong>
             </div>
+
+            <p style={{ color: "#666", marginBottom: "15px", fontSize: "14px" }}>
+              {description}
+            </p>
 
             <div className="product-choice-block">
               <h4>Choice A*</h4>

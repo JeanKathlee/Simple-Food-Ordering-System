@@ -24,6 +24,7 @@ export default function OrdersPanel({
   showFilters = true,
   isAdmin = false,
   onUpdateStatus,
+  onDeleteOrder,
 }) {
   return (
     <section className="admin-panel">
@@ -99,12 +100,13 @@ export default function OrdersPanel({
               <th>Total</th>
               <th>Created</th>
               {isAdmin && <th>Update</th>}
+              {isAdmin && <th>Delete</th>}
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 7 : 6} className="admin-empty-cell">
+                <td colSpan={isAdmin ? 8 : 6} className="admin-empty-cell">
                   No orders match the selected filters.
                 </td>
               </tr>
@@ -146,6 +148,26 @@ export default function OrdersPanel({
                         <option value="Delivered">Delivered</option>
                         <option value="Cancelled">Cancelled</option>
                       </select>
+                    </td>
+                  )}
+                  {isAdmin && (
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => onDeleteOrder && onDeleteOrder(order.id)}
+                        style={{
+                          padding: "6px 12px",
+                          backgroundColor: "#ff4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   )}
                 </tr>

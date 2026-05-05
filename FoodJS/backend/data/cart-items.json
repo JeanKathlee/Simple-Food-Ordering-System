@@ -17,15 +17,6 @@
       "quantity": 1,
       "selectedChoice": "Go Regular Iced Tea",
       "updatedAt": "2026-05-02T01:47:26.461Z"
-    },
-    {
-      "userId": 4,
-      "menuItemId": "M-1001",
-      "name": "Double Smash Burger",
-      "price": 179,
-      "quantity": 1,
-      "selectedChoice": "Go Regular Iced Tea",
-      "updatedAt": "2026-05-05T03:17:43.462Z"
     }
   ]
 }

@@ -27,7 +27,7 @@ router.get('/', (_req, res) => {
 
 // POST - create new menu item, for admin ra
 router.post('/', verifyToken, requireAdmin, (req, res) => {
-  const { name, categoryId, price, prepTime, isAvailable, image } = req.body || {};
+  const { name, categoryId, price, prepTime, isAvailable, image, description } = req.body || {};
 
   // Validate ang input
   if (!name || !categoryId || !price || !prepTime) {
@@ -52,7 +52,7 @@ router.post('/', verifyToken, requireAdmin, (req, res) => {
   const newItem = {
     id: getNextMenuId(),
     name,
-    description: '',
+    description: description || '',
     categoryId,
     category: category.name,
     price: Number(price),
@@ -74,7 +74,7 @@ router.post('/', verifyToken, requireAdmin, (req, res) => {
 // PUT - Update menu item, para admin ra
 router.put('/:id', verifyToken, requireAdmin, (req, res) => {
   const { id } = req.params;
-  const { name, categoryId, price, prepTime, isAvailable, image } = req.body || {};
+  const { name, categoryId, price, prepTime, isAvailable, image, description } = req.body || {};
 
   // Read sa current menu
   const data = readJsonFromData('menu.json');
@@ -105,6 +105,7 @@ router.put('/:id', verifyToken, requireAdmin, (req, res) => {
   data.menu[itemIndex] = {
     ...oldItem,
     name,
+    description: description !== undefined ? description : oldItem.description,
     categoryId,
     category: category.name,
     price: Number(price),

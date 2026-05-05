@@ -129,4 +129,22 @@ router.patch('/:id/status', verifyToken, requireAdmin, (req, res) => {
   res.json(order);
 });
 
+// DELETE - Delete order para admin only
+router.delete('/:id', verifyToken, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const data = readJsonFromData('orders.json');
+  
+  const orderIndex = (data.orders || []).findIndex(o => o.id === id);
+  
+  if (orderIndex === -1) {
+    return res.status(404).json({ message: 'Order not found.' });
+  }
+  
+  // Remove sa order
+  data.orders.splice(orderIndex, 1);
+  writeJsonToData('orders.json', data);
+  
+  res.json({ message: 'Order deleted successfully.' });
+});
+
 module.exports = router;

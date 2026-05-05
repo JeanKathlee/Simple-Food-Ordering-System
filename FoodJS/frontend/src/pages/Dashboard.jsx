@@ -83,6 +83,28 @@ function normalizeOrders(items = []) {
       total,
       itemCount,
       createdAt: order.createdAt || new Date().toISOString(),
+      items: order.items || []
+    };
+  });
+}
+
+function calculateSoldCounts(items = [], allOrders = []) {
+  return items.map((item) => {
+    let soldCount = 0;
+    
+    allOrders.forEach((order) => {
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((orderItem) => {
+          if (String(orderItem.menuItemId) === String(item.id)) {
+            soldCount += Number(orderItem.quantity || 0);
+          }
+        });
+      }
+    });
+    
+    return {
+      ...item,
+      soldCount,
     };
   });
 }
@@ -141,7 +163,6 @@ export default function Dashboard() {
       const nextCategories = Array.isArray(categoryData) ? categoryData : [];
       setCategories(nextCategories);
       setMenuItems(normalizeMenu(Array.isArray(menuData) ? menuData : [], nextCategories));
-      setOrders(normalizeOrders(Array.isArray(orderData) ? orderData : []));
       setWeeklyRevenue(
         Array.isArray(insightData?.weeklyRevenue) && insightData.weeklyRevenue.length > 0
           ? insightData.weeklyRevenue
@@ -196,6 +217,32 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Error:", err);
       alert("Error updating status");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this order? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session?.token}`,
+        },
+      });
+
+      if (response.ok) {
+        setAllOrders((prev) => prev.filter((order) => order.id !== orderId));
+        alert("Order deleted successfully!");
+      } else {
+        alert("Failed to delete order");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Error deleting order");
     }
   };
 
@@ -272,8 +319,9 @@ export default function Dashboard() {
   }, [filteredAdminOrders]);
 
   const topItems = useMemo(() => {
-    return [...menuItems].sort((a, b) => b.soldCount - a.soldCount).slice(0, 5);
-  }, [menuItems]);
+    const itemsWithRealCounts = calculateSoldCounts(menuItems, allOrders);
+    return [...itemsWithRealCounts].sort((a, b) => b.soldCount - a.soldCount).slice(0, 5);
+  }, [menuItems, allOrders]);
 
   const handleLogout = () => {
     clearAuthSession();
@@ -427,13 +475,19 @@ export default function Dashboard() {
             <AnalyticsCards stats={dashboardStats} topItems={topItems} />
 
             <div className="admin-content-grid">
-              <RevenueChart weeklyRevenue={weeklyRevenue} />
+              <RevenueChart 
+                weeklyRevenue={weeklyRevenue}
+                orders={allOrders.length > 0 ? allOrders : filteredAdminOrders}
+                dateRange={filters}
+              />
               <PopularItems topItems={topItems} />
             </div>
 
             <OrdersPanel
               title="Recent Client Orders"
-              orders={orders.slice(0, 6)}
+              orders={[...allOrders]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 6)}
               statusOptions={statusOptions}
               filters={filters}
               onFilterChange={handleOrderFilter}
@@ -460,6 +514,7 @@ export default function Dashboard() {
             onFilterChange={handleOrderFilter}
             isAdmin={true}
             onUpdateStatus={handleUpdateOrderStatus}
+            onDeleteOrder={handleDeleteOrder}
           />
         )}
 

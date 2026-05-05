@@ -20,10 +20,10 @@
       ],
       "itemCount": 3,
       "total": 447,
-      "status": "Delivered",
+      "status": "Pending",
       "archived": false,
       "createdAt": "2026-04-22T15:46:15.446Z",
-      "updatedAt": "2026-05-05T03:18:01.537Z"
+      "updatedAt": "2026-05-05T13:25:34.635Z"
     },
     {
       "id": "O-1002",
@@ -45,10 +45,10 @@
       ],
       "itemCount": 3,
       "total": 267,
-      "status": "Cancelled",
+      "status": "Preparing",
       "archived": false,
       "createdAt": "2026-04-29T15:46:15.446Z",
-      "updatedAt": "2026-05-05T12:49:50.851Z"
+      "updatedAt": "2026-05-05T13:25:37.469Z"
     },
     {
       "id": "O-1003",
@@ -69,28 +69,7 @@
       "paymentMethod": "cash",
       "status": "Ready",
       "createdAt": "2026-05-04T06:55:12.758Z",
-      "updatedAt": "2026-05-05T01:03:08.471Z"
-    },
-    {
-      "id": "O-1004",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-1002",
-          "name": "Fried Chicken Burger",
-          "price": 149,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-04T06:55:46.391Z"
-        }
-      ],
-      "total": 149,
-      "paymentMethod": "debit",
-      "status": "Delivered",
-      "createdAt": "2026-05-04T06:57:00.212Z",
-      "updatedAt": "2026-05-05T01:03:11.965Z"
+      "updatedAt": "2026-05-05T13:25:43.158Z"
     },
     {
       "id": "O-1005",
@@ -109,9 +88,9 @@
       ],
       "total": 129,
       "paymentMethod": "cash",
-      "status": "Cancelled",
+      "status": "Delivered",
       "createdAt": "2026-05-04T06:57:08.912Z",
-      "updatedAt": "2026-05-05T01:03:14.983Z"
+      "updatedAt": "2026-05-05T13:25:46.465Z"
     },
     {
       "id": "O-1006",
@@ -130,30 +109,9 @@
       ],
       "total": 89,
       "paymentMethod": "cash",
-      "status": "Pending",
+      "status": "Cancelled",
       "createdAt": "2026-05-04T07:02:56.856Z",
-      "updatedAt": "2026-05-05T01:03:18.552Z"
-    },
-    {
-      "id": "O-1007",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-1002",
-          "name": "Fried Chicken Burger",
-          "price": 149,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-04T14:04:50.471Z"
-        }
-      ],
-      "total": 149,
-      "paymentMethod": "cash",
-      "status": "Preparing",
-      "createdAt": "2026-05-04T14:04:59.724Z",
-      "updatedAt": "2026-05-05T01:03:20.935Z"
+      "updatedAt": "2026-05-05T13:25:49.248Z"
     },
     {
       "id": "O-1008",
@@ -172,9 +130,51 @@
       ],
       "total": 129,
       "paymentMethod": "cash",
-      "status": "Cancelled",
+      "status": "Pending",
       "createdAt": "2026-05-04T14:06:11.701Z",
-      "updatedAt": "2026-05-05T03:18:19.860Z"
+      "updatedAt": "2026-05-05T13:25:56.245Z"
+    },
+    {
+      "id": "O-1009",
+      "userId": 4,
+      "customerName": "Allain James Ybanez",
+      "items": [
+        {
+          "userId": 4,
+          "menuItemId": "M-1001",
+          "name": "Double Smash Burger",
+          "price": 179,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-05T03:17:43.462Z"
+        }
+      ],
+      "total": 179,
+      "paymentMethod": "cash",
+      "status": "Pending",
+      "createdAt": "2026-05-05T13:09:14.945Z",
+      "updatedAt": "2026-05-05T13:09:14.945Z"
+    },
+    {
+      "id": "O-1010",
+      "userId": 4,
+      "customerName": "Allain James Ybanez",
+      "items": [
+        {
+          "userId": 4,
+          "menuItemId": "M-3001",
+          "name": "Iced Cola",
+          "price": 59,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-05T13:13:32.145Z"
+        }
+      ],
+      "total": 59,
+      "paymentMethod": "cash",
+      "status": "Pending",
+      "createdAt": "2026-05-05T13:13:36.981Z",
+      "updatedAt": "2026-05-05T13:13:36.981Z"
     }
   ]
 }
