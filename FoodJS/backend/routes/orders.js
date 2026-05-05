@@ -1,7 +1,7 @@
 const express = require('express');
 const { readJsonFromData } = require('../lib/readJson');
 const { writeJsonToData } = require('../lib/writeJson');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -26,6 +26,12 @@ router.get('/', verifyToken, (req, res) => {
   
   const userOrders = (data.orders || []).filter(order => order.userId === userId);
   res.json(userOrders);
+});
+
+// GET - get all orders admin onle
+router.get('/admin/all', verifyToken, requireAdmin, (req, res) => {
+  const data = readJsonFromData('orders.json');
+  res.json(data.orders || []);
 });
 
 // GET - get specific order
@@ -101,7 +107,7 @@ router.patch('/:id/cancel', verifyToken, (req, res) => {
 });
 
 // PATCH - Update order status para admin only
-router.patch('/:id/status', verifyToken, (req, res) => {
+router.patch('/:id/status', verifyToken, requireAdmin, (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const data = readJsonFromData('orders.json');

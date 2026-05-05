@@ -1,6 +1,6 @@
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard" },
-  { key: "orders", label: "Orders" },
+  { key: "manage-orders", label: "Manage Orders" },
   { key: "menu", label: "Menu" },
   { key: "categories", label: "Categories" },
 ];

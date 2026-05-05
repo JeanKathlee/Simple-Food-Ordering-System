@@ -12,7 +12,7 @@ import PopularItems from "../components/admin/PopularItems";
 import ConfirmModal from "../components/admin/ConfirmModal";
 import "../dashboard.css";
 
-const DEFAULT_STATUS_OPTIONS = ["Pending", "Completed", "Cancelled"];
+const DEFAULT_STATUS_OPTIONS = ["Pending", "Preparing", "Ready", "Cancelled", "Delivered"];
 const DEFAULT_WEEKLY_REVENUE = [
   { day: "Mon", amount: 0 },
   { day: "Tue", amount: 0 },
@@ -94,6 +94,7 @@ export default function Dashboard() {
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
   const [weeklyRevenue, setWeeklyRevenue] = useState(DEFAULT_WEEKLY_REVENUE);
   const [statusOptions, setStatusOptions] = useState(DEFAULT_STATUS_OPTIONS);
   const [filters, setFilters] = useState({
@@ -157,9 +158,54 @@ export default function Dashboard() {
     }
   };
 
+  const loadAllOrders = async () => {
+    try {
+      const response = await fetch("/api/orders/admin/all", {
+        headers: { Authorization: `Bearer ${session?.token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAllOrders(normalizeOrders(Array.isArray(data) ? data : []));
+      }
+    } catch (_error) {
+      // silent fail
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        const normalized = normalizeOrders([updated]);
+        setAllOrders((prev) =>
+          prev.map((order) => (order.id === orderId ? normalized[0] : order))
+        );
+        alert("Status updated!");
+      } else {
+        alert("Failed to update status");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Error updating status");
+    }
+  };
+
   useEffect(() => {
     loadAdminData();
-    const pollingId = setInterval(loadAdminData, 15000);
+    loadAllOrders();
+    const pollingId = setInterval(() => {
+      loadAdminData();
+      loadAllOrders();
+    }, 15000);
 
     return () => clearInterval(pollingId);
   }, []);
@@ -182,6 +228,25 @@ export default function Dashboard() {
       return statusMatch && dateMatch && customerMatch && searchMatch;
     });
   }, [filters, orders]);
+
+  const filteredAdminOrders = useMemo(() => {
+    const customerFilter = filters.customer.trim().toLowerCase();
+    const searchFilter = filters.search.trim().toLowerCase();
+
+    return allOrders.filter((order) => {
+      const statusMatch = filters.status === "All" || order.status === filters.status;
+      const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
+      const customerMatch =
+        !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
+
+      const searchMatch =
+        !searchFilter ||
+        order.id.toLowerCase().includes(searchFilter) ||
+        order.customerName.toLowerCase().includes(searchFilter);
+
+      return statusMatch && dateMatch && customerMatch && searchMatch;
+    });
+  }, [filters, allOrders]);
 
   const dashboardStats = useMemo(() => {
     const today = new Date();
@@ -396,6 +461,18 @@ export default function Dashboard() {
             statusOptions={statusOptions}
             filters={filters}
             onFilterChange={handleOrderFilter}
+          />
+        )}
+
+        {activeSection === "manage-orders" && (
+          <OrdersPanel
+            title="All Orders - Admin Management"
+            orders={filteredAdminOrders}
+            statusOptions={statusOptions}
+            filters={filters}
+            onFilterChange={handleOrderFilter}
+            isAdmin={true}
+            onUpdateStatus={handleUpdateOrderStatus}
           />
         )}
 

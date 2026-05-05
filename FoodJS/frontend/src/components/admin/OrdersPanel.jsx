@@ -22,6 +22,8 @@ export default function OrdersPanel({
   onFilterChange,
   title = "Order Management",
   showFilters = true,
+  isAdmin = false,
+  onUpdateStatus,
 }) {
   return (
     <section className="admin-panel">
@@ -96,12 +98,13 @@ export default function OrdersPanel({
               <th>Items</th>
               <th>Total</th>
               <th>Created</th>
+              {isAdmin && <th>Update</th>}
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="admin-empty-cell">
+                <td colSpan={isAdmin ? 7 : 6} className="admin-empty-cell">
                   No orders match the selected filters.
                 </td>
               </tr>
@@ -118,6 +121,33 @@ export default function OrdersPanel({
                   <td>{order.itemCount}</td>
                   <td>{formatCurrency(order.total)}</td>
                   <td>{formatDate(order.createdAt)}</td>
+                  {isAdmin && (
+                    <td>
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          if (e.target.value && onUpdateStatus) {
+                            onUpdateStatus(order.id, e.target.value);
+                            e.target.value = "";
+                          }
+                        }}
+                        style={{
+                          padding: "6px",
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontSize: "12px",
+                        }}
+                      >
+                        <option value="">Change...</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Ready">Ready</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

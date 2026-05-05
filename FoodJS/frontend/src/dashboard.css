@@ -442,6 +442,21 @@
   color: #9d2929;
 }
 
+.admin-status.preparing {
+  background: #ffcb7e;
+  color: #9d2929;
+}
+
+.admin-status.ready {
+  background: #f3a618;
+  color: #9d2929;
+}
+
+.admin-status.delivered {
+  background: #81C784;
+  color: #241515;
+}
+
 .admin-empty-cell,
 .admin-empty-item {
   color: #8b6a52;
