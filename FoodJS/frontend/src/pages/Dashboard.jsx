@@ -8,6 +8,7 @@ import RevenueChart from "../components/admin/RevenueChart";
 import OrdersPanel from "../components/admin/OrdersPanel";
 import MenuManagement from "../components/admin/MenuManagement";
 import CategoryManagement from "../components/admin/CategoryManagement";
+import CouponManagement from "../components/admin/CouponManagement";
 import PopularItems from "../components/admin/PopularItems";
 import ConfirmModal from "../components/admin/ConfirmModal";
 import "../dashboard.css";
@@ -115,6 +116,7 @@ export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const [coupons, setCoupons] = useState([]);
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [weeklyRevenue, setWeeklyRevenue] = useState(DEFAULT_WEEKLY_REVENUE);
@@ -145,24 +147,27 @@ export default function Dashboard() {
 
   const loadAdminData = async () => {
     try {
-      const [categoriesResponse, menuResponse, ordersResponse, insightsResponse] =
+      const [categoriesResponse, menuResponse, ordersResponse, insightsResponse, couponsResponse] =
         await Promise.all([
           fetch("/api/categories"),
           fetch("/api/menu"),
           fetch("/api/orders"),
           fetch("/api/admin-insights"),
+          fetch("/api/coupons"),
         ]);
 
-      const [categoryData, menuData, orderData, insightData] = await Promise.all([
+      const [categoryData, menuData, orderData, insightData, couponData] = await Promise.all([
         categoriesResponse.json(),
         menuResponse.json(),
         ordersResponse.json(),
         insightsResponse.json(),
+        couponsResponse.json(),
       ]);
 
       const nextCategories = Array.isArray(categoryData) ? categoryData : [];
       setCategories(nextCategories);
       setMenuItems(normalizeMenu(Array.isArray(menuData) ? menuData : [], nextCategories));
+      setCoupons(Array.isArray(couponData) ? couponData : []);
       setWeeklyRevenue(
         Array.isArray(insightData?.weeklyRevenue) && insightData.weeklyRevenue.length > 0
           ? insightData.weeklyRevenue
@@ -512,6 +517,94 @@ export default function Dashboard() {
     });
   };
 
+  const handleAddCoupon = async (payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch("/api/coupons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to add coupon");
+        return;
+      }
+
+      const newCoupon = await response.json();
+      setCoupons((current) => [newCoupon, ...current]);
+      bumpSyncState("coupons");
+    } catch (err) {
+      alert("Error adding coupon");
+    }
+  };
+
+  const handleUpdateCoupon = async (id, payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch(`/api/coupons/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to update coupon");
+        return;
+      }
+
+      const updatedCoupon = await response.json();
+      setCoupons((current) =>
+        current.map((coupon) => (coupon.id === id ? updatedCoupon : coupon))
+      );
+      bumpSyncState("coupons");
+    } catch (err) {
+      alert("Error updating coupon");
+    }
+  };
+
+  const handleDeleteCoupon = async (id) => {
+    setModalConfig({
+      open: true,
+      title: "Delete coupon",
+      message: "This coupon will be permanently deleted.",
+      confirmLabel: "Delete Coupon",
+      onConfirm: async () => {
+        try {
+          const session = getAuthSession();
+          const response = await fetch(`/api/coupons/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session?.token}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alert(error?.message || "Failed to delete coupon");
+            setModalConfig((current) => ({ ...current, open: false }));
+            return;
+          }
+
+          setCoupons((current) => current.filter((coupon) => coupon.id !== id));
+          setModalConfig((current) => ({ ...current, open: false }));
+          bumpSyncState("coupons");
+        } catch (err) {
+          alert("Error deleting coupon");
+          setModalConfig((current) => ({ ...current, open: false }));
+        }
+      },
+    });
+  };
+
   const closeModal = () => {
     setModalConfig((current) => ({ ...current, open: false }));
   };
@@ -592,6 +685,15 @@ export default function Dashboard() {
             onAddCategory={handleAddCategory}
             onUpdateCategory={handleUpdateCategory}
             onDeleteCategory={handleDeleteCategory}
+          />
+        )}
+
+        {activeSection === "coupons" && (
+          <CouponManagement
+            coupons={coupons}
+            onAddCoupon={handleAddCoupon}
+            onUpdateCoupon={handleUpdateCoupon}
+            onDeleteCoupon={handleDeleteCoupon}
           />
         )}
       </main>

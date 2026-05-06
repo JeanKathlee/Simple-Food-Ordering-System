@@ -20,10 +20,10 @@
       ],
       "itemCount": 3,
       "total": 447,
-      "status": "Pending",
+      "status": "Delivered",
       "archived": false,
-      "createdAt": "2026-04-22T15:46:15.446Z",
-      "updatedAt": "2026-05-05T13:25:34.635Z"
+      "createdAt": "2026-05-06T15:46:15.446Z",
+      "updatedAt": "2026-05-06T14:04:57.648Z"
     },
     {
       "id": "O-1002",
@@ -45,10 +45,10 @@
       ],
       "itemCount": 3,
       "total": 267,
-      "status": "Preparing",
+      "status": "Delivered",
       "archived": false,
-      "createdAt": "2026-04-29T15:46:15.446Z",
-      "updatedAt": "2026-05-05T13:25:37.469Z"
+      "createdAt": "2026-05-05T15:46:15.446Z",
+      "updatedAt": "2026-05-06T14:05:00.762Z"
     },
     {
       "id": "O-1003",
@@ -67,9 +67,33 @@
       ],
       "total": 179,
       "paymentMethod": "cash",
-      "status": "Ready",
+      "status": "Delivered",
       "createdAt": "2026-05-04T06:55:12.758Z",
-      "updatedAt": "2026-05-05T13:25:43.158Z"
+      "updatedAt": "2026-05-06T14:05:03.329Z"
+    },
+    {
+      "id": "O-1004",
+      "userId": 4,
+      "customerName": "Allain James Ybanez",
+      "items": [
+        {
+          "userId": 4,
+          "menuItemId": "M-4002",
+          "name": "Special 67",
+          "price": 67,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-06T13:55:50.469Z"
+        }
+      ],
+      "subtotal": 67,
+      "discount": 0,
+      "total": 67,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Delivered",
+      "createdAt": "2026-05-03T13:55:59.798Z",
+      "updatedAt": "2026-05-06T14:05:05.579Z"
     },
     {
       "id": "O-1005",
@@ -78,103 +102,22 @@
       "items": [
         {
           "userId": 4,
-          "menuItemId": "M-1003",
-          "name": "Classic Cheese Burger",
-          "price": 129,
+          "menuItemId": "M-2002",
+          "name": "Loaded Fries",
+          "price": 159,
           "quantity": 1,
           "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-04T06:57:06.878Z"
+          "updatedAt": "2026-05-06T13:57:16.379Z"
         }
       ],
-      "total": 129,
+      "subtotal": 159,
+      "discount": 15.9,
+      "total": 143.1,
+      "couponCode": "SAVE10",
       "paymentMethod": "cash",
       "status": "Delivered",
-      "createdAt": "2026-05-04T06:57:08.912Z",
-      "updatedAt": "2026-05-05T13:25:46.465Z"
-    },
-    {
-      "id": "O-1006",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-2001",
-          "name": "Crispy Fries",
-          "price": 89,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-04T07:02:45.952Z"
-        }
-      ],
-      "total": 89,
-      "paymentMethod": "cash",
-      "status": "Cancelled",
-      "createdAt": "2026-05-04T07:02:56.856Z",
-      "updatedAt": "2026-05-05T13:25:49.248Z"
-    },
-    {
-      "id": "O-1008",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-1003",
-          "name": "Classic Cheese Burger",
-          "price": 129,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-04T14:06:03.067Z"
-        }
-      ],
-      "total": 129,
-      "paymentMethod": "cash",
-      "status": "Pending",
-      "createdAt": "2026-05-04T14:06:11.701Z",
-      "updatedAt": "2026-05-05T13:25:56.245Z"
-    },
-    {
-      "id": "O-1009",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-1001",
-          "name": "Double Smash Burger",
-          "price": 179,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-05T03:17:43.462Z"
-        }
-      ],
-      "total": 179,
-      "paymentMethod": "cash",
-      "status": "Pending",
-      "createdAt": "2026-05-05T13:09:14.945Z",
-      "updatedAt": "2026-05-05T13:09:14.945Z"
-    },
-    {
-      "id": "O-1010",
-      "userId": 4,
-      "customerName": "Allain James Ybanez",
-      "items": [
-        {
-          "userId": 4,
-          "menuItemId": "M-3001",
-          "name": "Iced Cola",
-          "price": 59,
-          "quantity": 1,
-          "selectedChoice": "Go Regular Iced Tea",
-          "updatedAt": "2026-05-05T13:13:32.145Z"
-        }
-      ],
-      "total": 59,
-      "paymentMethod": "cash",
-      "status": "Pending",
-      "createdAt": "2026-05-05T13:13:36.981Z",
-      "updatedAt": "2026-05-05T13:13:36.981Z"
+      "createdAt": "2026-05-02T13:57:25.537Z",
+      "updatedAt": "2026-05-06T14:05:08.033Z"
     }
   ]
 }

@@ -3,6 +3,7 @@ const NAV_ITEMS = [
   { key: "manage-orders", label: "Manage Orders" },
   { key: "menu", label: "Menu" },
   { key: "categories", label: "Categories" },
+  { key: "coupons", label: "Coupons" },
 ];
 
 export default function AdminSidebar({ activeSection, onSectionChange }) {

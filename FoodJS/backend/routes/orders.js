@@ -52,7 +52,7 @@ router.get('/:id', verifyToken, (req, res) => {
 // POST - Create new order
 router.post('/', verifyToken, (req, res) => {
   const userId = req.user.sub;
-  const { items, customerName, paymentMethod } = req.body || {};
+  const { items, customerName, paymentMethod, couponCode, discount } = req.body || {};
   
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Items are required.' });
@@ -62,14 +62,18 @@ router.post('/', verifyToken, (req, res) => {
     return res.status(400).json({ message: 'Customer name is required.' });
   }
   
-  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = subtotal - (discount || 0);
   
   const newOrder = {
     id: getNextOrderId(),
     userId,
     customerName,
     items,
-    total,
+    subtotal,
+    discount: discount || 0,
+    total: Math.max(0, total),
+    couponCode: couponCode || null,
     paymentMethod: paymentMethod || 'cash',
     status: 'Pending',
     createdAt: new Date().toISOString(),
@@ -79,6 +83,18 @@ router.post('/', verifyToken, (req, res) => {
   const data = readJsonFromData('orders.json');
   data.orders.push(newOrder);
   writeJsonToData('orders.json', data);
+  
+  if (couponCode) {
+    try {
+      const couponsData = readJsonFromData('coupons.json');
+      const coupon = couponsData.coupons.find(c => c.code.toUpperCase() === couponCode.toUpperCase());
+      if (coupon) {
+        coupon.usedCount += 1;
+        writeJsonToData('coupons.json', couponsData);
+      }
+    } catch (err) {
+    }
+  }
   
   res.status(201).json(newOrder);
 });
