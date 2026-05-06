@@ -419,26 +419,63 @@ export default function Dashboard() {
     });
   };
 
-  const handleAddCategory = (payload) => {
-    setCategories((current) => [
-      {
-        id: `cat-${Date.now().toString().slice(-4)}`,
-        ...payload,
-      },
-      ...current,
-    ]);
-    bumpSyncState("categories");
+  const handleAddCategory = async (payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch("/api/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to add category");
+        return;
+      }
+
+      const newCategory = await response.json();
+      setCategories((current) => [newCategory, ...current]);
+      bumpSyncState("categories");
+    } catch (err) {
+      alert("Error adding category");
+    }
   };
 
-  const handleUpdateCategory = (id, payload) => {
-    setCategories((current) =>
-      current.map((category) => (category.id === id ? { ...category, ...payload } : category))
-    );
-    bumpSyncState("categories");
+  const handleUpdateCategory = async (id, payload) => {
+    try {
+      const session = getAuthSession();
+      const response = await fetch(`/api/categories/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error?.message || "Failed to update category");
+        return;
+      }
+
+      const updatedCategory = await response.json();
+      setCategories((current) =>
+        current.map((category) => (category.id === id ? updatedCategory : category))
+      );
+      bumpSyncState("categories");
+    } catch (err) {
+      alert("Error updating category");
+    }
   };
 
-  const handleDeleteCategory = (id, itemCount) => {
+  const handleDeleteCategory = async (id, itemCount) => {
     if (itemCount > 0) {
+      alert("Cannot delete category with items. Remove items first.");
       return;
     }
 
@@ -447,10 +484,30 @@ export default function Dashboard() {
       title: "Delete category",
       message: "This category will be removed from your menu organization.",
       confirmLabel: "Delete Category",
-      onConfirm: () => {
-        setCategories((current) => current.filter((category) => category.id !== id));
-        setModalConfig((current) => ({ ...current, open: false }));
-        bumpSyncState("categories");
+      onConfirm: async () => {
+        try {
+          const session = getAuthSession();
+          const response = await fetch(`/api/categories/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session?.token}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alert(error?.message || "Failed to delete category");
+            setModalConfig((current) => ({ ...current, open: false }));
+            return;
+          }
+
+          setCategories((current) => current.filter((category) => category.id !== id));
+          setModalConfig((current) => ({ ...current, open: false }));
+          bumpSyncState("categories");
+        } catch (err) {
+          alert("Error deleting category");
+          setModalConfig((current) => ({ ...current, open: false }));
+        }
       },
     });
   };
