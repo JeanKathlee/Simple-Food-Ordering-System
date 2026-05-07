@@ -1,5 +1,13 @@
+const COUPON_FORMAT = /^[A-Z0-9]{4,12}$/;
+
 function validateCoupon(couponCode, orderAmount, couponsData) {
-  const coupon = couponsData.coupons.find(c => c.code.toUpperCase() === couponCode.toUpperCase());
+  const normalizedCode = String(couponCode || '').trim().toUpperCase();
+
+  if (!COUPON_FORMAT.test(normalizedCode)) {
+    return { valid: false, error: 'Invalid coupon format' };
+  }
+
+  const coupon = couponsData.coupons.find(c => c.code.toUpperCase() === normalizedCode);
 
   if (!coupon) {
     return { valid: false, error: 'Coupon not found' };

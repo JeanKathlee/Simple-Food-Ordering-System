@@ -66,8 +66,16 @@ export default function Checkout() {
   };
 
   const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) {
+    const normalizedCode = couponCode.trim().toUpperCase();
+    const isValidFormat = /^[A-Z0-9]{4,12}$/.test(normalizedCode);
+
+    if (!normalizedCode) {
       setCouponError("Please enter a coupon code");
+      return;
+    }
+
+    if (!isValidFormat) {
+      setCouponError("Coupon must be 4-12 letters or numbers");
       return;
     }
 
@@ -75,7 +83,7 @@ export default function Checkout() {
       const response = await fetch("/api/coupons/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponCode, orderAmount: subtotal }),
+        body: JSON.stringify({ code: normalizedCode, orderAmount: subtotal }),
       });
 
       const result = await response.json();
@@ -176,7 +184,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="checkout-view">
+    <div className="checkout-view client-page checkout-page">
       <div className="checkout-topbar">
         <h1>Checkout</h1>
         <button type="button" onClick={() => navigate(-1)}>
@@ -266,18 +274,12 @@ export default function Checkout() {
               />
               <button type="button" onClick={handleApplyCoupon}>Apply</button>
             </div>
-            {couponError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{couponError}</p>}
+            {couponError && <p className="checkout-coupon-error">{couponError}</p>}
             {appliedCoupon && (
-              <div style={{ 
-                backgroundColor: "#e8f5e9", 
-                padding: "10px", 
-                borderRadius: "5px", 
-                marginTop: "10px",
-                fontSize: "13px"
-              }}>
+              <div className="checkout-coupon-success">
                 <strong>✓ Coupon Applied!</strong>
                 <p>{appliedCoupon.description}</p>
-                <p style={{ color: "green", fontWeight: "bold" }}>-{formatPrice(discountAmount)}</p>
+                <p className="checkout-coupon-savings">-{formatPrice(discountAmount)}</p>
               </div>
             )}
 

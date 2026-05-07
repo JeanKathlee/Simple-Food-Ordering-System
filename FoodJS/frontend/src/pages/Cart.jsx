@@ -114,245 +114,81 @@ export default function Cart() {
   );
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return <div className="page-loading">Loading...</div>;
   }
 
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "30px" }}>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          ← Back to Menu
-        </button>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Home
-        </button>
-      </div>
+    <div className="client-page cart-page">
+      <div className="client-shell">
+        <header className="page-topbar">
+          <div>
+            <h1>My Cart</h1>
+            <p>Review your items before checkout.</p>
+          </div>
+          <div className="page-actions">
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>← Back to Menu</button>
+            <button className="client-btn ghost" onClick={() => navigate("/")}>Home</button>
+          </div>
+        </header>
 
-      <h1>My Cart</h1>
-
-      {cartItems.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            backgroundColor: "#f5f5f5",
-            borderRadius: "8px",
-          }}
-        >
-          <p style={{ fontSize: "18px", color: "#666", marginBottom: "20px" }}>
-            Your cart is empty
-          </p>
-          <button
-            onClick={() => navigate("/menu")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#1976d2",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "16px",
-            }}
-          >
-            Start Adding Items
-          </button>
-        </div>
-      ) : (
-        <>
-          {/* Cart Items */}
-          <div style={{ marginBottom: "30px" }}>
-            {cartItems.map((item) => (
-              <div
-                key={item.menuItemId}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "15px",
-                  backgroundColor: "#f9f9f9",
-                  borderRadius: "8px",
-                  marginBottom: "10px",
-                  border: "1px solid #eee",
-                }}
-              >
-                <div>
-                  <p style={{ margin: "0", fontWeight: "bold", fontSize: "16px" }}>
-                    {item.name}
-                  </p>
-                  <p style={{ margin: "5px 0 0 0", color: "#666", fontSize: "14px" }}>
-                    {formatPrice(item.price)} each
-                  </p>
-                </div>
-
-                <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "8px",
-                      alignItems: "center",
-                      backgroundColor: "white",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      padding: "0 8px",
-                    }}
-                  >
-                    <button
-                      onClick={() =>
-                        adjustQuantity(item.menuItemId, item.quantity - 1)
-                      }
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        padding: "4px",
-                      }}
-                    >
-                      −
-                    </button>
-                    <span style={{ padding: "0 8px", minWidth: "30px", textAlign: "center" }}>
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() =>
-                        adjustQuantity(item.menuItemId, item.quantity + 1)
-                      }
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        padding: "4px",
-                      }}
-                    >
-                      +
-                    </button>
+        {cartItems.length === 0 ? (
+          <section className="panel-card empty-state">
+            <h2>Your cart is empty</h2>
+            <p>Browse the menu to add your first meal.</p>
+            <button className="client-btn primary" onClick={() => navigate("/menu")}>Start Adding Items</button>
+          </section>
+        ) : (
+          <div className="cart-layout">
+            <section className="panel-card cart-list">
+              {cartItems.map((item) => (
+                <div key={item.menuItemId} className="cart-item">
+                  <div className="cart-item-info">
+                    <h3>{item.name}</h3>
+                    <p>{formatPrice(item.price)} each</p>
                   </div>
 
-                  <p
-                    style={{
-                      margin: "0",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      minWidth: "100px",
-                      textAlign: "right",
-                    }}
-                  >
-                    {formatPrice(item.price * item.quantity)}
-                  </p>
+                  <div className="cart-item-controls">
+                    <div className="qty-control">
+                      <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
+                        −
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
+                        +
+                      </button>
+                    </div>
 
-                  <button
-                    onClick={() => removeFromCart(item.menuItemId)}
-                    style={{
-                      padding: "6px 12px",
-                      backgroundColor: "#f44336",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Remove
-                  </button>
+                    <strong>{formatPrice(item.price * item.quantity)}</strong>
+
+                    <button
+                      type="button"
+                      className="client-btn danger ghost"
+                      onClick={() => removeFromCart(item.menuItemId)}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </section>
+
+            <aside className="panel-card cart-summary">
+              <h2>Summary</h2>
+              <div className="summary-row">
+                <span>Total</span>
+                <strong>{formatPrice(total)}</strong>
               </div>
-            ))}
+              <button className="client-btn primary" onClick={() => navigate("/checkout")}>
+                Proceed to Checkout
+              </button>
+              <button className="client-btn danger" onClick={clearCart}>Clear Cart</button>
+              <button className="client-btn ghost" onClick={() => navigate("/menu")}>
+                Continue Shopping
+              </button>
+            </aside>
           </div>
-
-          <div
-            style={{
-              backgroundColor: "#fff9c4",
-              padding: "20px",
-              borderRadius: "8px",
-              marginBottom: "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "15px",
-              }}
-            >
-              <span>Total:</span>
-              <span>{formatPrice(total)}</span>
-            </div>
-
-            <button
-              onClick={() => navigate("/checkout")}
-              style={{
-                width: "100%",
-                padding: "12px",
-                backgroundColor: "#4caf50",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              Proceed to Checkout
-            </button>
-
-            <button
-              onClick={clearCart}
-              style={{
-                width: "100%",
-                padding: "12px",
-                backgroundColor: "#f44336",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "16px",
-              }}
-            >
-              Clear Cart
-            </button>
-          </div>
-
-          <button
-            onClick={() => navigate("/menu")}
-            style={{
-              width: "100%",
-              padding: "12px",
-              backgroundColor: "#757575",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "16px",
-            }}
-          >
-            Continue Shopping
-          </button>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
