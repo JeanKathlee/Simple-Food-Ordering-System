@@ -39,6 +39,14 @@
       "passwordHash": "$2a$10$otXezMff0uUk55VjHS6tDuygFAmt/yCfGapopCi4/F.uRcKrzywT6",
       "role": "customer",
       "createdAt": "2026-05-02T01:43:30.632Z"
+    },
+    {
+      "id": 6,
+      "name": "ALLAIN JAMES YBA�EZ",
+      "email": "allainjames.ybanez.23@usjr.edu.ph",
+      "passwordHash": "$2a$10$4U5vLlO619vOnoJ1k7AvUeD6jIue.fZpNZC2XEACz.YizTIlmFgFW",
+      "role": "customer",
+      "createdAt": "2026-05-07T05:12:47.826Z"
     }
   ]
 }

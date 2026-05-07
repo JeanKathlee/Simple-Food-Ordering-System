@@ -53,6 +53,14 @@ export default function Login() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const clientId = "383406826534-8al6042a0n42itk48fpis06m0r81ip8k.apps.googleusercontent.com";
+    const redirectUri = "http://localhost:5173/auth/callback";
+    const scope = "email profile";
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    window.location.href = url;
+  };
+
   return (
     <div className="auth-page">
       <motion.form
@@ -99,7 +107,12 @@ export default function Login() {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <button className="btn-secondary" type="button">
+        <button
+          className="btn-secondary"
+          type="button"
+          onClick={handleGoogleLogin}
+          style={{ backgroundColor: "#4285F4" }}
+        >
           Login with Google
         </button>
 

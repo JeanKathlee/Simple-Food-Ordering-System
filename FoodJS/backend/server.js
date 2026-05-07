@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -13,6 +14,7 @@ const categoriesRouter = require('./routes/categories');
 const adminInsightsRouter = require('./routes/adminInsights');
 const cartRouter = require('./routes/cart');
 const couponsRouter = require('./routes/coupons');
+const googleAuthRouter = require('./routes/googleAuth');
 
 app.use('/api/menu', menuRouter);
 app.use('/api/orders', ordersRouter);
@@ -21,6 +23,7 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/admin-insights', adminInsightsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/coupons', couponsRouter);
+app.use('/api/auth/google', googleAuthRouter);
 
 app.get('/', (_req, res) => {
   res.json({
