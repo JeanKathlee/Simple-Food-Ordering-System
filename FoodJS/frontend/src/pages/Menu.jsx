@@ -18,6 +18,7 @@ export default function Menu() {
   const [query, setQuery] = useState("");
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showBag, setShowBag] = useState(false);
 
   // Load sa menu and cart
   useEffect(() => {
@@ -256,157 +257,172 @@ export default function Menu() {
   const hasCartItems = cartItems.length > 0;
 
   return (
-    <div className="customer-home-page">
-      <section className="customer-home-hero">
-        <div className="customer-home-toprow">
-          <div className="customer-home-brand">
-            <img src={logo} alt="FoodJS" />
-            <div>
-              <h1>FoodJS</h1>
-              <p>Choose your favorites and order fast.</p>
-            </div>
-          </div>
-
-          <div className="customer-home-actions">
-            <span className="customer-home-user">Hi, {getAuthSession()?.user?.name || "Customer"}</span>
-            <button type="button" className="customer-home-logout" onClick={() => navigate("/cart")}>
-              My Cart ({cartCount})
-            </button>
-            <button type="button" className="customer-home-logout" onClick={() => navigate("/order-history")}>
-              My Orders
-            </button>
-            <button type="button" className="customer-home-logout" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </div>
-
-        <div className="customer-search-wrap">
-          <input
-            className="customer-search"
-            type="search"
-            placeholder="Search menu"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <span className="customer-search-icon">⌕</span>
-        </div>
-
-        <div className="customer-chip-row">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              className={`customer-chip ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className={`customer-layout ${hasCartItems ? "with-bag" : ""}`}>
-        <div className="customer-main">
-          <div className="customer-grid-wrap">
-            <div className="customer-grid">
-              {visibleItems.map((item) => (
-                <article
-                  key={item.name}
-                  className="customer-card"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() =>
-                    navigate(`/product/${encodeURIComponent(item.name)}`, {
-                      state: { item },
-                    })
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      navigate(`/product/${encodeURIComponent(item.name)}`, {
-                        state: { item },
-                      });
-                    }
-                  }}
-                >
-                  <img src={item.image} alt={item.name} className="customer-card-image" />
-                  <h3>{item.name}</h3>
-                  <p>{item.description}</p>
-                  <strong>{formatPrice(item.price)}</strong>
-                  <button
-                    type="button"
-                    className="customer-add-btn"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      navigate(`/product/${encodeURIComponent(item.name)}`, {
-                        state: { item },
-                      });
-                    }}
-                    aria-label={`Add ${item.name}`}
-                  >
-                    +
-                  </button>
-                </article>
-              ))}
-            </div>
-
-            {!visibleItems.length && (
-              <div className="customer-empty-state">
-                <h2>No matches found.</h2>
-                <p>Try a different keyword or category.</p>
+    <div className="client-page menu-page">
+      <div className="client-shell">
+        <div className="menu-topbar-wrap">
+          <header className="page-topbar menu-topbar">
+            <div className="menu-brand">
+              <img src={logo} alt="FoodJS" />
+              <div>
+                <h1>FoodJS Menu</h1>
+                <p>Choose your favorites and order fast.</p>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {hasCartItems && <aside className="my-bag-panel">
-          <div className="my-bag-header-row">
-            <h2>My Bag</h2>
-            <div className="my-bag-meta">
-              <span>{cartCount} item{cartCount === 1 ? "" : "s"}</span>
-              <button type="button" onClick={clearCart} disabled={!cartItems.length}>
-                Delete All
+            <div className="page-actions">
+              <button
+                type="button"
+                className="client-btn ghost"
+                onClick={() => setShowBag((prev) => !prev)}
+              >
+                My Bag ({cartCount})
+              </button>
+              <button type="button" className="client-btn ghost" onClick={() => navigate("/order-history")}>
+                Orders
+              </button>
+              <button type="button" className="client-btn" onClick={handleLogout}>
+                Logout
               </button>
             </div>
-          </div>
+          </header>
 
-          <div className="my-bag-list">
-            {cartItems.map((item) => (
-              <article key={item.menuItemId} className="my-bag-item">
-                <h3>{item.name}</h3>
-                <p>{formatPrice(item.price * item.quantity)}</p>
-                <div className="my-bag-item-actions">
-                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
-                    +
-                  </button>
-                  <button type="button" className="remove" onClick={() => removeFromCart(item.menuItemId)}>
-                    Remove
+          {showBag && (
+            <div className="menu-bag-dropdown">
+              <div className="menu-bag-header">
+                <div>
+                  <h2>My Bag</h2>
+                  <p>{cartCount} item{cartCount === 1 ? "" : "s"}</p>
+                </div>
+                <div className="menu-bag-header-actions">
+                  <button
+                    type="button"
+                    className="client-btn ghost"
+                    onClick={clearCart}
+                    disabled={!cartItems.length}
+                  >
+                    Clear
                   </button>
                 </div>
-              </article>
-            ))}
+              </div>
+
+              {cartItems.length === 0 ? (
+                <div className="menu-bag-empty">
+                  <p>Your bag is empty.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="menu-bag-list">
+                    {cartItems.map((item) => (
+                      <div key={item.menuItemId} className="menu-bag-item">
+                        <div>
+                          <h3>{item.name}</h3>
+                          <p>{formatPrice(item.price * item.quantity)}</p>
+                        </div>
+                        <div className="menu-bag-actions">
+                          <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
+                            −
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
+                            +
+                          </button>
+                          <button type="button" className="remove" onClick={() => removeFromCart(item.menuItemId)}>
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="menu-bag-total">
+                    <div>
+                      <span>Subtotal</span>
+                      <strong>{formatPrice(subtotal)}</strong>
+                    </div>
+                    <button type="button" className="client-btn primary" onClick={() => navigate("/cart")}>
+                      Check Cart
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        <section className="panel-card menu-toolbar">
+          <div className="menu-toolbar-header">
+            <p className="menu-greeting">Hi, {getAuthSession()?.user?.name || "Customer"}</p>
+          </div>
+          <div className="menu-search-row">
+            <input
+              className="menu-search-input"
+              type="search"
+              placeholder="Search menu items"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+            <span className="menu-search-icon">⌕</span>
           </div>
 
-          <div className="my-bag-total">
-            <div>
-              <span>Subtotal</span>
-              <strong>{formatPrice(subtotal)}</strong>
-            </div>
-            <div>
-              <span>Total</span>
-              <strong>{formatPrice(subtotal)}</strong>
-            </div>
-            <button type="button" disabled={!cartItems.length} onClick={() => navigate("/cart")}>
-              Proceed to Checkout
-            </button>
+          <div className="menu-tab-row">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                className={`menu-tab ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
-        </aside>}
-      </section>
+        </section>
+
+        {loading ? (
+          <div className="page-loading">Loading menu...</div>
+        ) : (
+          <section className="menu-layout">
+            <div className="menu-grid">
+              {visibleItems.map((item) => (
+                <article key={item.name} className="menu-card">
+                  <img src={item.image} alt={item.name} className="menu-card-image" />
+                  <div className="menu-card-body">
+                    <h3>{item.name}</h3>
+                    <p>{item.description || "Freshly prepared and served hot."}</p>
+                  </div>
+                  <div className="menu-card-footer">
+                    <strong>{formatPrice(item.price)}</strong>
+                    <div className="menu-card-actions">
+                      <button
+                        type="button"
+                        className="client-btn ghost"
+                        onClick={() =>
+                          navigate(`/product/${encodeURIComponent(item.name)}`, {
+                            state: { item },
+                          })
+                        }
+                      >
+                        View
+                      </button>
+                      <button type="button" className="client-btn primary" onClick={() => addToCart(item)}>
+                        Add to cart
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+
+              {!visibleItems.length && (
+                <div className="panel-card empty-state">
+                  <h2>No matches found</h2>
+                  <p>Try a different keyword or category.</p>
+                </div>
+              )}
+            </div>
+
+          </section>
+        )}
+      </div>
     </div>
   );
 }

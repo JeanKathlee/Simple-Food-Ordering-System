@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchMenuFromBackend, enrichMenuWithImages, formatPrice } from "../data/menuItems";
 import { getAuthSession } from "../lib/auth";
@@ -40,11 +40,14 @@ export default function ProductDetails() {
 
   if (!item) {
     return (
-      <div className="product-page">
-        <div className="product-page-header" />
-        <div className="product-page-missing">
-          <h2>Product not found.</h2>
-          <button type="button" onClick={() => navigate("/menu")}>Back to Menu</button>
+      <div className="client-page product-page">
+        <div className="client-shell">
+          <div className="panel-card product-empty">
+            <h2>Product not found.</h2>
+            <button type="button" className="client-btn" onClick={() => navigate("/menu")}>
+              Back to Menu
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -98,45 +101,40 @@ export default function ProductDetails() {
   };
 
   return (
-    <div className="product-page">
-      <header className="product-top-nav">
-        <div className="product-top-left">
-          <h1>FoodJS</h1>
-          <button type="button">Select your address</button>
-        </div>
-        <div className="product-top-right">
-          <button type="button" onClick={() => navigate("/menu")}>Menu</button>
-          <button type="button" className="product-order-now" onClick={() => navigate("/checkout")}>
-            Order Now
-          </button>
-        </div>
-      </header>
+    <div className="client-page product-page">
+      <div className="client-shell">
+        <header className="page-topbar">
+          <div>
+            <h1>Product Details</h1>
+            <p>Customize your order and add it to the cart.</p>
+          </div>
+          <div className="page-actions">
+            <button type="button" className="client-btn ghost" onClick={() => navigate("/menu")}>← Back</button>
+            <button type="button" className="client-btn ghost" onClick={() => navigate("/cart")}>Cart</button>
+            <button type="button" className="client-btn" onClick={() => navigate("/checkout")}>
+              Checkout
+            </button>
+          </div>
+        </header>
 
-      <section className="product-page-content">
-        <div className="product-title-strip">
-          <button type="button" className="product-back-link" onClick={() => navigate("/menu")}>
-            ←
-          </button>
-          <h2>Product details</h2>
-        </div>
-
-        <div className="product-structure-card">
-          <div className="product-left">
-            <img src={item.image} alt={item.name} className="product-main-image" />
+        <section className="product-layout">
+          <div className="panel-card product-media">
+            <img src={item.image} alt={item.name} className="product-media-image" />
           </div>
 
-          <div className="product-right">
-            <div className="product-heading-row">
-              <h3>{item.name}</h3>
+          <div className="panel-card product-info">
+            <div className="product-heading">
+              <div>
+                <span className="product-label">Featured Item</span>
+                <h2>{item.name}</h2>
+              </div>
               <strong>{formatPrice(item.price)}</strong>
             </div>
 
-            <p style={{ color: "#666", marginBottom: "15px", fontSize: "14px" }}>
-              {description}
-            </p>
+            <p className="product-description">{description}</p>
 
             <div className="product-choice-block">
-              <h4>Choice A*</h4>
+              <h3>Drink Choice</h3>
               <p>Select 1 option</p>
 
               <div className="choice-list">
@@ -168,9 +166,9 @@ export default function ProductDetails() {
                 </button>
               </div>
 
-              <button 
-                type="button" 
-                className="product-add-bag" 
+              <button
+                type="button"
+                className="client-btn primary product-add"
                 onClick={handleAddToBag}
                 disabled={loading}
               >
@@ -178,8 +176,8 @@ export default function ProductDetails() {
               </button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

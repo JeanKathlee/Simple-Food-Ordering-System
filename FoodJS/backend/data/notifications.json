@@ -3,49 +3,49 @@
     {
       "id": "N-1001",
       "userId": 2,
-      "orderId": "O-1006",
+      "orderId": "O-1007",
       "channel": "in-app",
       "title": "Order status updated",
-      "message": "Order O-1006 status updated to Preparing.",
+      "message": "Order O-1007 status updated to Preparing.",
       "status": "Preparing",
-      "read": true,
-      "createdAt": "2026-05-07T03:21:41.389Z",
-      "readAt": "2026-05-07T03:24:14.290Z"
+      "read": false,
+      "createdAt": "2026-05-07T04:15:57.694Z"
     },
     {
       "id": "N-1002",
       "userId": 2,
-      "orderId": "O-1006",
+      "orderId": "O-1007",
       "channel": "email",
       "title": "Order status updated",
-      "message": "Order O-1006 status updated to Preparing.",
+      "message": "Order O-1007 status updated to Preparing.",
       "status": "Preparing",
       "email": "juan@food.local",
       "read": true,
-      "createdAt": "2026-05-07T03:21:41.389Z"
+      "createdAt": "2026-05-07T04:15:57.694Z"
     },
     {
       "id": "N-1003",
       "userId": 2,
-      "orderId": "O-1006",
+      "orderId": "O-1008",
       "channel": "in-app",
       "title": "Order status updated",
-      "message": "Order O-1006 status updated to Cancelled.",
+      "message": "Order O-1008 status updated to Cancelled.",
       "status": "Cancelled",
-      "read": false,
-      "createdAt": "2026-05-07T03:25:04.765Z"
+      "read": true,
+      "createdAt": "2026-05-07T04:19:19.968Z",
+      "readAt": "2026-05-07T04:19:23.399Z"
     },
     {
       "id": "N-1004",
       "userId": 2,
-      "orderId": "O-1006",
+      "orderId": "O-1008",
       "channel": "email",
       "title": "Order status updated",
-      "message": "Order O-1006 status updated to Cancelled.",
+      "message": "Order O-1008 status updated to Cancelled.",
       "status": "Cancelled",
       "email": "juan@food.local",
       "read": true,
-      "createdAt": "2026-05-07T03:25:04.765Z"
+      "createdAt": "2026-05-07T04:19:19.968Z"
     }
   ]
 }

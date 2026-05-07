@@ -813,21 +813,20 @@ body {
 }
 
 .product-qty-row button {
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
   border: none;
   border-radius: 999px;
   background: #ededed;
   color: #333;
-  font-size: 38px;
+  font-size: 25px;
   line-height: 1;
   cursor: pointer;
 }
 
 .product-qty-row span {
-  min-width: 40px;
   text-align: center;
-  font-size: 43px;
+  font-size: 25px;
   font-family: "Baloo 2", sans-serif;
 }
 
@@ -1785,9 +1784,119 @@ body {
   font-family: "Baloo 2", sans-serif;
 }
 
+.checkout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.checkout-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checkout-panel {
+  padding: 18px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #f1dbc5;
+  box-shadow: 0 10px 20px rgba(140, 77, 22, 0.06);
+}
+
+.checkout-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.checkout-section-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.checkout-section-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.checkout-section-header span {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff0dd;
+  color: #8a4e16;
+  font-weight: 700;
+}
+
+.checkout-section-header.compact {
+  margin-bottom: 8px;
+}
+
+.checkout-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+
+.checkout-summary-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #f1dbc5;
+  box-shadow: 0 12px 24px rgba(140, 77, 22, 0.08);
+}
+
+.checkout-summary-card h2 {
+  font-size: 20px;
+}
+
+.checkout-summary-total {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checkout-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+}
+
+.checkout-discount {
+  color: #1d6a2f;
+  font-weight: 600;
+}
+
+.checkout-place-order {
+  width: 100%;
+  margin-top: 16px;
+  height: 46px;
+}
+
+.checkout-coupon {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f1dbc5;
+}
+
 @media (max-width: 1000px) {
-  .checkout-layout {
+  .checkout-layout,
+  .checkout-grid {
     grid-template-columns: 1fr;
+  }
+
+  .checkout-summary {
+    position: static;
   }
 }
 
@@ -1796,25 +1905,6 @@ body {
   .checkout-payment-row,
   .checkout-coupon-row {
     grid-template-columns: 1fr;
-  }
-
-  .checkout-card h2,
-  .checkout-summary-card h2 {
-    font-size: 32px;
-  }
-
-  .checkout-footer-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .checkout-footer-row button {
-    width: 100%;
-    font-size: 31px;
-  }
-
-  .checkout-footer-row strong {
-    font-size: 42px;
   }
 }
 
@@ -2314,6 +2404,16 @@ body {
   font-family: "Baloo 2", sans-serif;
 }
 
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cart-summary .client-btn + .client-btn {
+  margin-top: 8px;
+}
+
 .summary-row {
   display: flex;
   justify-content: space-between;
@@ -2340,6 +2440,87 @@ body {
 .order-highlight p {
   margin-top: 4px;
   color: #7a5636;
+}
+
+.order-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(130deg, #fff1e0 0%, #fff8f2 100%);
+}
+
+.order-hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #b86a2a;
+}
+
+.order-hero h2 {
+  margin: 8px 0 4px;
+  font-size: 26px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.order-hero p {
+  color: #7a5636;
+  font-size: 13px;
+}
+
+.order-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.order-hero-meta span {
+  font-size: 11px;
+  color: #7a5636;
+}
+
+.order-hero-meta strong {
+  font-size: 18px;
+}
+
+.order-confirm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.order-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.order-section-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.order-section-header span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a4e16;
+  background: #fff0dd;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.order-items-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .status-pill {
@@ -2417,6 +2598,22 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .order-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-hero-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .order-confirm-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tracking-layout {
@@ -2685,6 +2882,415 @@ body {
 
   .filter-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.menu-page .page-topbar {
+  align-items: center;
+}
+
+.menu-topbar-wrap {
+  position: relative;
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-brand img {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: #fff1e2;
+  padding: 6px;
+}
+
+.menu-greeting {
+  font-size: 12px;
+  color: #8a5a34;
+  font-weight: 600;
+}
+
+.menu-toolbar-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-search-row {
+  position: relative;
+}
+
+.menu-search-input {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid #efdac5;
+  padding: 0 42px 0 14px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.menu-search-input:focus {
+  outline: none;
+  border-color: #f2a15e;
+  box-shadow: 0 0 0 3px rgba(242, 161, 94, 0.2);
+}
+
+.menu-search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a5a34;
+}
+
+.menu-tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.menu-tab {
+  border: 1px solid #f0d7be;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5b3820;
+  cursor: pointer;
+}
+
+.menu-tab.active {
+  background: #ffb56b;
+  border-color: #ffb56b;
+  color: #2a1406;
+}
+
+.menu-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.menu-grid .empty-state {
+  grid-column: 1 / -1;
+}
+
+.menu-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #f1dbc5;
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: 0 10px 20px rgba(140, 77, 22, 0.08);
+  min-height: 320px;
+}
+
+.menu-card-image {
+  width: 100%;
+  height: 150px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.menu-card-body h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.menu-card-body p {
+  color: #7a5636;
+  font-size: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 44px;
+}
+
+.menu-card-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-card-footer strong {
+  font-size: 16px;
+}
+
+.menu-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.menu-bag h2 {
+  margin: 0;
+  font-size: 20px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.menu-bag-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: min(420px, 100%);
+  background: #ffffff;
+  border: 1px solid #f2dcc6;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 16px 30px rgba(140, 77, 22, 0.16);
+  z-index: 5;
+}
+
+.menu-bag-header-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.menu-bag-empty {
+  padding: 12px 0 4px;
+  color: #7a5636;
+  font-size: 13px;
+}
+
+.menu-bag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.menu-bag-header p {
+  font-size: 12px;
+  color: #7a5636;
+}
+
+.menu-bag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-bag-item {
+  background: #fff7ef;
+  border: 1px solid #f2dcc6;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.menu-bag-item h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.menu-bag-item p {
+  font-size: 12px;
+  color: #7a5636;
+}
+
+.menu-bag-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-bag-actions button {
+  border: none;
+  background: #2f2418;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.menu-bag-actions span {
+  min-width: 18px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.menu-bag-actions .remove {
+  margin-left: auto;
+  background: transparent;
+  color: #8a4e16;
+  width: auto;
+  height: auto;
+}
+
+.menu-bag-total {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-bag-total div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.product-page.client-page {
+  background: transparent;
+}
+
+.product-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.product-media-image {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.product-info h2 {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 28px;
+  margin: 6px 0 0;
+}
+
+.product-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid #f1dbc5;
+  padding-bottom: 12px;
+}
+
+.product-heading strong {
+  font-size: 20px;
+}
+
+.product-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b86a2a;
+  font-weight: 700;
+}
+
+.product-description {
+  margin-top: 10px;
+  color: #7a5636;
+  font-size: 13px;
+}
+
+.product-choice-block h3 {
+  font-size: 16px;
+  margin: 0;
+  font-family: "Baloo 2", sans-serif;
+}
+
+.product-choice-block p {
+  font-size: 12px;
+  color: #7a5636;
+}
+
+.product-info .choice-row span {
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
+}
+
+.product-info .choice-row em {
+  font-size: 12px;
+}
+
+.product-add {
+  width: 100%;
+}
+
+.checkout-page .checkout-topbar {
+  display: none;
+}
+
+.checkout-page .checkout-layout {
+  margin-top: 0;
+}
+
+.checkout-page .checkout-card,
+.checkout-page .checkout-summary-card {
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #f1dbc5;
+  box-shadow: 0 10px 20px rgba(140, 77, 22, 0.06);
+}
+
+.checkout-page .checkout-card h2,
+.checkout-page .checkout-summary-card h2 {
+  font-size: 20px;
+}
+
+.checkout-page .checkout-footer-row strong {
+  font-size: 28px;
+}
+
+.tracking-page .client-shell {
+  max-width: 1320px;
+}
+
+.tracking-page .tracking-layout {
+  align-items: stretch;
+  min-height: calc(100vh - 220px);
+}
+
+@media (max-width: 1000px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-bag-dropdown {
+    position: static;
+    width: 100%;
+    margin-top: 12px;
   }
 }
 

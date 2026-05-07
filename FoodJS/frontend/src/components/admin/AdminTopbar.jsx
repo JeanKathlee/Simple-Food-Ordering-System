@@ -2,7 +2,7 @@ export default function AdminTopbar({ onLogout, adminName, syncLabel }) {
   return (
     <header className="admin-topbar">
       <div>
-        <h1>Restaurant Admin Dashboard</h1>
+        <h1>Admin Dashboard</h1>
         <p>Track orders, menu, and categories in one workspace.</p>
       </div>
 

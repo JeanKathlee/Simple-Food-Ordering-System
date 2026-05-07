@@ -179,11 +179,11 @@ export default function Cart() {
                 <strong>{formatPrice(total)}</strong>
               </div>
               <button className="client-btn primary" onClick={() => navigate("/checkout")}>
-                Proceed to Checkout
+                Checkout
               </button>
               <button className="client-btn danger" onClick={clearCart}>Clear Cart</button>
               <button className="client-btn ghost" onClick={() => navigate("/menu")}>
-                Continue Shopping
+                Order More
               </button>
             </aside>
           </div>

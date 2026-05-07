@@ -185,157 +185,182 @@ export default function Checkout() {
 
   return (
     <div className="checkout-view client-page checkout-page">
-      <div className="checkout-topbar">
-        <h1>Checkout</h1>
-        <button type="button" onClick={() => navigate(-1)}>
-          Back
-        </button>
-      </div>
+      <div className="client-shell">
+        <header className="page-topbar">
+          <div>
+            <h1>Checkout</h1>
+            <p>Confirm details, payment, and delivery in one place.</p>
+          </div>
+          <div className="page-actions">
+            <button type="button" className="client-btn ghost" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          </div>
+        </header>
 
-      <div className="checkout-layout">
-        <section className="checkout-left">
-          <article className="checkout-card">
-            <h2>Contact Details</h2>
+        <div className="checkout-grid">
+          <section className="checkout-main">
+            <article className="panel-card checkout-panel">
+              <div className="checkout-section-header">
+                <h2>Contact Details</h2>
+                <span>Step 1</span>
+              </div>
 
-            <div className="checkout-name-row">
-              <label>
-                <span>First Name</span>
+              <div className="checkout-name-row">
+                <label>
+                  <span>First Name</span>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    placeholder="Enter your first name"
+                  />
+                </label>
+                <label>
+                  <span>Last Name</span>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Enter your last name"
+                  />
+                </label>
+              </div>
+
+              <label className="checkout-single-input">
+                <span>Mobile Number</span>
                 <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
+                  type="tel"
+                  name="mobileNumber"
+                  value={formData.mobileNumber}
                   onChange={handleInputChange}
-                  placeholder="Enter your first name"
+                  placeholder="Enter your mobile number"
                 />
               </label>
-              <label>
-                <span>Last Name</span>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  placeholder="Enter your last name"
-                />
-              </label>
-            </div>
+            </article>
 
-            <label className="checkout-single-input">
-              <span>Mobile Number</span>
-              <input
-                type="tel"
-                name="mobileNumber"
-                value={formData.mobileNumber}
+            <article className="panel-card checkout-panel">
+              <div className="checkout-section-header">
+                <h2>Delivery</h2>
+                <span>Step 2</span>
+              </div>
+
+              <p className="checkout-field-label">Delivery Address</p>
+              <textarea
+                className="checkout-address"
+                name="address"
+                value={formData.address}
                 onChange={handleInputChange}
-                placeholder="Enter your mobile number"
+                placeholder="Enter your delivery address"
               />
-            </label>
-          </article>
+            </article>
+          </section>
 
-          <article className="checkout-card">
-            <h2>Delivery Address</h2>
+          <aside className="checkout-aside">
+            <article className="panel-card checkout-panel">
+              <div className="checkout-section-header">
+                <h2>Payment</h2>
+                <span>Step 3</span>
+              </div>
 
-            <p className="checkout-field-label">Payment Method</p>
-            <div className="checkout-payment-row">
+              <div className="checkout-payment-row">
+                <button
+                  type="button"
+                  className={`checkout-payment ${paymentMethod === "cash" ? "active" : ""}`}
+                  onClick={() => setPaymentMethod("cash")}
+                >
+                  <strong>Cash</strong>
+                  <span>Pay on delivery</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`checkout-payment ${paymentMethod === "card" ? "active" : ""}`}
+                  onClick={() => setPaymentMethod("card")}
+                >
+                  <strong>Credit Card</strong>
+                  <span>Online payment</span>
+                </button>
+              </div>
+
+              <div className="checkout-coupon">
+                <div className="checkout-section-header compact">
+                  <h3>Discount / Coupon</h3>
+                </div>
+                <div className="checkout-coupon-row">
+                  <input
+                    placeholder="Enter code (ex: SAVE10)"
+                    value={couponCode}
+                    onChange={(event) => setCouponCode(event.target.value)}
+                  />
+                  <button type="button" onClick={handleApplyCoupon}>Apply</button>
+                </div>
+                {couponError && <p className="checkout-coupon-error">{couponError}</p>}
+                {appliedCoupon && (
+                  <div className="checkout-coupon-success">
+                    <strong>✓ Coupon Applied!</strong>
+                    <p>{appliedCoupon.description}</p>
+                    <p className="checkout-coupon-savings">-{formatPrice(discountAmount)}</p>
+                  </div>
+                )}
+              </div>
+            </article>
+
+            <article className="panel-card checkout-summary-card">
+              <div className="checkout-section-header">
+                <h2>Order Summary</h2>
+                <span>{cartItems.length} item{cartItems.length === 1 ? "" : "s"}</span>
+              </div>
+
+              <div className="checkout-summary-list">
+                {!cartItems.length && <p className="checkout-empty">No items in bag yet.</p>}
+
+                {cartItems.map((item) => (
+                  <div key={item.name} className="checkout-summary-item">
+                    <div>
+                      <h3>
+                        x{item.quantity} {item.name}
+                      </h3>
+                      <p>
+                        {item.selectedChoice || item.selectedDrink || "Meal option"}
+                        {item.selectedSize ? ` ${item.selectedSize}` : ""}
+                      </p>
+                    </div>
+                    <strong>{formatPrice(item.price * item.quantity)}</strong>
+                  </div>
+                ))}
+              </div>
+
+              <div className="checkout-summary-total">
+                <div>
+                  <span>Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="checkout-discount">
+                    <span>Discount</span>
+                    <span>-{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
+                <div className="checkout-summary-total-row">
+                  <strong>Total</strong>
+                  <strong>{formatPrice(total)}</strong>
+                </div>
+              </div>
+
               <button
                 type="button"
-                className={`checkout-payment ${paymentMethod === "cash" ? "active" : ""}`}
-                onClick={() => setPaymentMethod("cash")}
+                className="client-btn primary checkout-place-order"
+                disabled={!cartItems.length || loading}
+                onClick={handlePlaceOrder}
               >
-                <strong>Cash</strong>
-                <span>Pay on delivery</span>
-              </button>
-
-              <button
-                type="button"
-                className={`checkout-payment ${paymentMethod === "card" ? "active" : ""}`}
-                onClick={() => setPaymentMethod("card")}
-              >
-                <strong>Credit Card</strong>
-                <span>Online payment</span>
-              </button>
-            </div>
-
-            <p className="checkout-field-label">Address</p>
-            <textarea
-              className="checkout-address"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              placeholder="Enter your delivery address"
-            />
-
-            <p className="checkout-field-label">Discount / Coupon</p>
-            <div className="checkout-coupon-row">
-              <input
-                placeholder="Enter code (ex: SAVE10)"
-                value={couponCode}
-                onChange={(event) => setCouponCode(event.target.value)}
-              />
-              <button type="button" onClick={handleApplyCoupon}>Apply</button>
-            </div>
-            {couponError && <p className="checkout-coupon-error">{couponError}</p>}
-            {appliedCoupon && (
-              <div className="checkout-coupon-success">
-                <strong>✓ Coupon Applied!</strong>
-                <p>{appliedCoupon.description}</p>
-                <p className="checkout-coupon-savings">-{formatPrice(discountAmount)}</p>
-              </div>
-            )}
-
-            <div className="checkout-footer-row">
-              <div>
-                <span>Total</span>
-                <strong>{formatPrice(total)}</strong>
-              </div>
-              <button type="button" disabled={!cartItems.length || loading} onClick={handlePlaceOrder}>
                 {loading ? "Placing Order..." : "Place Order"}
               </button>
-            </div>
-          </article>
-        </section>
-
-        <aside className="checkout-right">
-          <article className="checkout-summary-card">
-            <h2>Order Summary</h2>
-
-            <div className="checkout-summary-list">
-              {!cartItems.length && <p className="checkout-empty">No items in bag yet.</p>}
-
-              {cartItems.map((item) => (
-                <div key={item.name} className="checkout-summary-item">
-                  <div>
-                    <h3>
-                      x{item.quantity} {item.name}
-                    </h3>
-                    <p>
-                      {item.selectedChoice || item.selectedDrink || "Meal option"}
-                      {item.selectedSize ? ` ${item.selectedSize}` : ""}
-                    </p>
-                  </div>
-                  <strong>{formatPrice(item.price * item.quantity)}</strong>
-                </div>
-              ))}
-            </div>
-
-            <div className="checkout-summary-total">
-              <div>
-                <span>Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
-              </div>
-              {discountAmount > 0 && (
-                <div style={{ color: "green" }}>
-                  <span>Discount</span>
-                  <span>-{formatPrice(discountAmount)}</span>
-                </div>
-              )}
-              <div>
-                <strong>Total</strong>
-                <strong>{formatPrice(total)}</strong>
-              </div>
-            </div>
-          </article>
-        </aside>
+            </article>
+          </aside>
+        </div>
       </div>
     </div>
   );
