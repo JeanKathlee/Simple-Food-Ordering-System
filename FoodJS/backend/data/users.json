@@ -47,6 +47,22 @@
       "passwordHash": "$2a$10$4U5vLlO619vOnoJ1k7AvUeD6jIue.fZpNZC2XEACz.YizTIlmFgFW",
       "role": "customer",
       "createdAt": "2026-05-07T05:12:47.826Z"
+    },
+    {
+      "id": 7,
+      "name": "Alin Jims",
+      "email": "aljimboi13@gmail.com",
+      "passwordHash": "$2a$10$Ry/qOiNvBNTfZsbboA694OeD3eDaB9i6dHvWbHYwWq.FXFU3ewFGa",
+      "role": "customer",
+      "createdAt": "2026-05-07T17:15:32.109Z"
+    },
+    {
+      "id": 8,
+      "name": "Alin Jims",
+      "email": "alinjims28@gmail.com",
+      "passwordHash": "$2a$10$KM4rvpJp/0Q0AT9NnWZvB.fvT22D7.T7Btx.yD3g2JdbwNDB.QjtK",
+      "role": "customer",
+      "createdAt": "2026-05-07T17:15:45.448Z"
     }
   ]
 }
