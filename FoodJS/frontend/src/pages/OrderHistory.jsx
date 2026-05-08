@@ -14,11 +14,13 @@ export default function OrderHistory() {
   const [filterDateTo, setFilterDateTo] = useState("");
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadOrders = async () => {
       try {
         const session = getAuthSession();
         const token = session?.token;
-        
+
         if (!token) {
           navigate("/menu");
           return;
@@ -30,16 +32,31 @@ export default function OrderHistory() {
 
         if (response.ok) {
           const data = await response.json();
-          setOrders(data.reverse());
+          if (isMounted) {
+            setOrders(data.reverse());
+          }
         }
       } catch (err) {
         console.error("Failed to load orders:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadOrders();
+
+    const intervalId = setInterval(loadOrders, 10000);
+    const handleFocus = () => loadOrders();
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [navigate]);
 
   const filteredOrders = orders.filter((order) => {
