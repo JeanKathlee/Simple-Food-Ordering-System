@@ -4,6 +4,29 @@ const { writeJsonToData } = require('../lib/writeJson');
 const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
+const ALLOWED_ORDER_STATUSES = ['Pending', 'Preparing', 'Ready', 'Delivered', 'Cancelled'];
+const ORDER_STATUS_TRANSITIONS = {
+  Pending: ['Preparing', 'Cancelled'],
+  Preparing: ['Ready', 'Cancelled'],
+  Ready: ['Delivered'],
+  Delivered: [],
+  Cancelled: [],
+};
+
+function appendStatusHistory(order, { fromStatus, toStatus, actorId, actorRole, source }) {
+  if (!Array.isArray(order.statusHistory)) {
+    order.statusHistory = [];
+  }
+
+  order.statusHistory.push({
+    fromStatus: fromStatus || null,
+    toStatus,
+    actorId: actorId ?? null,
+    actorRole: actorRole || 'system',
+    source: source || 'system',
+    changedAt: new Date().toISOString(),
+  });
+}
 
 // Generate order ID
 function getNextOrderId() {
@@ -133,9 +156,18 @@ router.post('/', verifyToken, (req, res) => {
     couponCode: couponCode || null,
     paymentMethod: paymentMethod || 'cash',
     status: 'Pending',
+    statusHistory: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
+  appendStatusHistory(newOrder, {
+    fromStatus: null,
+    toStatus: 'Pending',
+    actorId: userId,
+    actorRole: req.user?.role || 'customer',
+    source: 'customer-create',
+  });
   
   const data = readJsonFromData('orders.json');
   data.orders.push(newOrder);
@@ -156,7 +188,7 @@ router.post('/', verifyToken, (req, res) => {
   res.status(201).json(newOrder);
 });
 
-// PATCH - Cancel order paras pending or preparing orders only
+// PATCH - Cancel order allowed only while kitchen has not finished it
 router.patch('/:id/cancel', verifyToken, (req, res) => {
   const { id } = req.params;
   const userId = req.user.sub;
@@ -168,12 +200,21 @@ router.patch('/:id/cancel', verifyToken, (req, res) => {
     return res.status(404).json({ message: 'Order not found.' });
   }
   
-  if (order.status === 'Delivered' || order.status === 'Completed' || order.status === 'Cancelled') {
+  if (!['Pending', 'Preparing'].includes(order.status)) {
     return res.status(400).json({ message: `Cannot cancel order with status: ${order.status}` });
   }
+
+  const previousStatus = order.status;
   
   order.status = 'Cancelled';
   order.updatedAt = new Date().toISOString();
+  appendStatusHistory(order, {
+    fromStatus: previousStatus,
+    toStatus: 'Cancelled',
+    actorId: userId,
+    actorRole: req.user?.role || 'customer',
+    source: 'customer-cancel',
+  });
   
   writeJsonToData('orders.json', data);
   recordStatusNotification(order, order.status);
@@ -196,12 +237,34 @@ router.patch('/:id/status', verifyToken, requireAdmin, (req, res) => {
     return res.status(400).json({ message: 'Status is required.' });
   }
 
+  if (!ALLOWED_ORDER_STATUSES.includes(status)) {
+    return res.status(400).json({
+      message: `Invalid status. Allowed values: ${ALLOWED_ORDER_STATUSES.join(', ')}`,
+    });
+  }
+
   if (order.status === status) {
     return res.json(order);
   }
+
+  const allowedNextStatuses = ORDER_STATUS_TRANSITIONS[order.status] || [];
+  if (!allowedNextStatuses.includes(status)) {
+    return res.status(400).json({
+      message: `Invalid status transition from ${order.status} to ${status}. Allowed next status: ${allowedNextStatuses.join(', ') || 'none'}`,
+    });
+  }
+
+  const previousStatus = order.status;
   
   order.status = status;
   order.updatedAt = new Date().toISOString();
+  appendStatusHistory(order, {
+    fromStatus: previousStatus,
+    toStatus: status,
+    actorId: req.user?.sub ?? null,
+    actorRole: req.user?.role || 'admin',
+    source: 'admin-update',
+  });
   
   writeJsonToData('orders.json', data);
   recordStatusNotification(order, order.status);

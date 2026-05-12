@@ -11,6 +11,8 @@ import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderHistory from "./pages/OrderHistory";
+import { NotificationProvider } from "./context/NotificationContext";
+import { NotificationContainer } from "./components/NotificationContainer";
 import { getUserRole, isAuthenticated } from "./lib/auth";
 
 function AdminRoute({ children }) {
@@ -39,7 +41,9 @@ function CustomerRoute({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <NotificationContainer />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -111,6 +115,7 @@ export default function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }

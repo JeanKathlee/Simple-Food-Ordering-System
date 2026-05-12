@@ -20,10 +20,20 @@
       ],
       "itemCount": 3,
       "total": 447,
-      "status": "Delivered",
+      "status": "Preparing",
       "archived": false,
       "createdAt": "2026-05-06T15:46:15.446Z",
-      "updatedAt": "2026-05-06T14:04:57.648Z"
+      "updatedAt": "2026-05-07T14:39:50.320Z",
+      "statusHistory": [
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T14:39:50.320Z"
+        }
+      ]
     },
     {
       "id": "O-1002",
@@ -118,6 +128,393 @@
       "status": "Delivered",
       "createdAt": "2026-05-02T13:57:25.537Z",
       "updatedAt": "2026-05-06T14:05:08.033Z"
+    },
+    {
+      "id": "O-1006",
+      "userId": 8,
+      "customerName": "jean Villegas",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1001",
+          "name": "Double Smash Burger",
+          "price": 179,
+          "quantity": 1,
+          "selectedChoice": null,
+          "updatedAt": "2026-05-07T10:07:35.572Z"
+        },
+        {
+          "userId": 8,
+          "menuItemId": "M-3001",
+          "name": "Iced Cola",
+          "price": 59,
+          "quantity": 1,
+          "selectedChoice": null,
+          "updatedAt": "2026-05-07T10:07:38.997Z"
+        }
+      ],
+      "subtotal": 238,
+      "discount": 50,
+      "total": 188,
+      "couponCode": "PALDO50",
+      "paymentMethod": "cash",
+      "status": "Preparing",
+      "createdAt": "2026-05-07T10:08:27.753Z",
+      "updatedAt": "2026-05-07T10:10:28.944Z"
+    },
+    {
+      "id": "O-1007",
+      "userId": 8,
+      "customerName": "jean VILLEGAS",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-2002",
+          "name": "Loaded Fries",
+          "price": 159,
+          "quantity": 1,
+          "selectedChoice": null,
+          "updatedAt": "2026-05-07T10:09:00.250Z"
+        }
+      ],
+      "subtotal": 159,
+      "discount": 0,
+      "total": 159,
+      "couponCode": null,
+      "paymentMethod": "card",
+      "status": "Delivered",
+      "createdAt": "2026-05-07T10:09:28.891Z",
+      "updatedAt": "2026-05-07T15:10:16.570Z",
+      "statusHistory": [
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T14:39:57.567Z"
+        },
+        {
+          "fromStatus": "Preparing",
+          "toStatus": "Ready",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T15:10:08.876Z"
+        },
+        {
+          "fromStatus": "Ready",
+          "toStatus": "Delivered",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T15:10:16.570Z"
+        }
+      ]
+    },
+    {
+      "id": "O-1008",
+      "userId": 8,
+      "customerName": "jean VILLEGAS",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 2,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-07T11:50:38.442Z"
+        }
+      ],
+      "subtotal": 298,
+      "discount": 0,
+      "total": 298,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Cancelled",
+      "createdAt": "2026-05-07T11:51:24.596Z",
+      "updatedAt": "2026-05-07T14:40:16.018Z",
+      "statusHistory": [
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Cancelled",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T14:40:16.018Z"
+        }
+      ]
+    },
+    {
+      "id": "O-1009",
+      "userId": 8,
+      "customerName": "jean Villegas",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 3,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-07T14:14:30.099Z"
+        }
+      ],
+      "subtotal": 447,
+      "discount": 0,
+      "total": 447,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Preparing",
+      "createdAt": "2026-05-07T14:15:46.782Z",
+      "updatedAt": "2026-05-07T14:39:59.150Z",
+      "statusHistory": [
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T14:39:59.150Z"
+        }
+      ]
+    },
+    {
+      "id": "O-1010",
+      "userId": 8,
+      "customerName": "jean VILLEGAS",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1003",
+          "name": "Classic Cheese Burger",
+          "price": 129,
+          "quantity": 2,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-07T14:37:24.835Z"
+        }
+      ],
+      "subtotal": 258,
+      "discount": 0,
+      "total": 258,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Preparing",
+      "statusHistory": [
+        {
+          "fromStatus": null,
+          "toStatus": "Pending",
+          "actorId": 8,
+          "actorRole": "customer",
+          "source": "customer-create",
+          "changedAt": "2026-05-07T14:37:58.157Z"
+        },
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-07T14:40:17.575Z"
+        }
+      ],
+      "createdAt": "2026-05-07T14:37:58.157Z",
+      "updatedAt": "2026-05-07T14:40:17.575Z"
+    },
+    {
+      "id": "O-1011",
+      "userId": 2,
+      "customerName": "Juan Dela Cruz",
+      "items": [
+        {
+          "userId": 2,
+          "menuItemId": "M-1001",
+          "name": "Double Smash Burger",
+          "price": 179,
+          "quantity": 2,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-09T01:09:24.619Z"
+        },
+        {
+          "userId": 2,
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-09T01:09:08.939Z"
+        }
+      ],
+      "subtotal": 507,
+      "discount": 0,
+      "total": 507,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Preparing",
+      "statusHistory": [
+        {
+          "fromStatus": null,
+          "toStatus": "Pending",
+          "actorId": 2,
+          "actorRole": "customer",
+          "source": "customer-create",
+          "changedAt": "2026-05-09T01:13:43.946Z"
+        },
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-09T01:15:17.483Z"
+        }
+      ],
+      "createdAt": "2026-05-09T01:13:43.946Z",
+      "updatedAt": "2026-05-09T01:15:17.483Z"
+    },
+    {
+      "id": "O-1012",
+      "userId": 8,
+      "customerName": "jean VILLEGAS",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1001",
+          "name": "Double Smash Burger",
+          "price": 229,
+          "quantity": 1,
+          "selectedChoice": "Go Large Iced Tea",
+          "updatedAt": "2026-05-09T01:31:58.152Z"
+        }
+      ],
+      "subtotal": 229,
+      "discount": 22.9,
+      "total": 206.1,
+      "couponCode": "PALDO10",
+      "paymentMethod": "cash",
+      "status": "Delivered",
+      "statusHistory": [
+        {
+          "fromStatus": null,
+          "toStatus": "Pending",
+          "actorId": 8,
+          "actorRole": "customer",
+          "source": "customer-create",
+          "changedAt": "2026-05-09T01:33:14.976Z"
+        },
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Preparing",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-09T01:34:57.939Z"
+        },
+        {
+          "fromStatus": "Preparing",
+          "toStatus": "Ready",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-09T01:35:13.599Z"
+        },
+        {
+          "fromStatus": "Ready",
+          "toStatus": "Delivered",
+          "actorId": 1,
+          "actorRole": "admin",
+          "source": "admin-update",
+          "changedAt": "2026-05-09T01:35:45.685Z"
+        }
+      ],
+      "createdAt": "2026-05-09T01:33:14.976Z",
+      "updatedAt": "2026-05-09T01:35:45.685Z"
+    },
+    {
+      "id": "O-1013",
+      "userId": 8,
+      "customerName": "jean Villegas",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 4,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-09T01:54:06.113Z"
+        },
+        {
+          "userId": 8,
+          "menuItemId": "M-1003",
+          "name": "Classic Cheese Burger",
+          "price": 129,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-09T01:50:05.545Z"
+        }
+      ],
+      "subtotal": 725,
+      "discount": 0,
+      "total": 725,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Cancelled",
+      "statusHistory": [
+        {
+          "fromStatus": null,
+          "toStatus": "Pending",
+          "actorId": 8,
+          "actorRole": "customer",
+          "source": "customer-create",
+          "changedAt": "2026-05-09T01:56:58.595Z"
+        },
+        {
+          "fromStatus": "Pending",
+          "toStatus": "Cancelled",
+          "actorId": 8,
+          "actorRole": "customer",
+          "source": "customer-cancel",
+          "changedAt": "2026-05-09T01:57:31.046Z"
+        }
+      ],
+      "createdAt": "2026-05-09T01:56:58.595Z",
+      "updatedAt": "2026-05-09T01:57:31.046Z"
+    },
+    {
+      "id": "O-1014",
+      "userId": 8,
+      "customerName": "jean Villegas",
+      "items": [
+        {
+          "userId": 8,
+          "menuItemId": "M-1002",
+          "name": "Fried Chicken Burger",
+          "price": 149,
+          "quantity": 1,
+          "selectedChoice": "Go Regular Iced Tea",
+          "updatedAt": "2026-05-09T01:58:01.012Z"
+        }
+      ],
+      "subtotal": 149,
+      "discount": 0,
+      "total": 149,
+      "couponCode": null,
+      "paymentMethod": "cash",
+      "status": "Pending",
+      "statusHistory": [
+        {
+          "fromStatus": null,
+          "toStatus": "Pending",
+          "actorId": 8,
+          "actorRole": "customer",
+          "source": "customer-create",
+          "changedAt": "2026-05-09T01:58:31.347Z"
+        }
+      ],
+      "createdAt": "2026-05-09T01:58:31.346Z",
+      "updatedAt": "2026-05-09T01:58:31.347Z"
     }
   ]
 }

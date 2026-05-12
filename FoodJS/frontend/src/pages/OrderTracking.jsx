@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatPrice } from "../data/menuItems";
 import { getAuthSession } from "../lib/auth";
+import { useNotification } from "../hooks/useNotification";
 
 export default function OrderTracking() {
   const navigate = useNavigate();
+  const { success, error: errorNotif } = useNotification();
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
+  const [orderNotifications, setOrderNotifications] = useState([]);
   const [noticesLoading, setNoticesLoading] = useState(true);
 
   const loadOrder = async () => {
@@ -53,7 +55,10 @@ export default function OrderTracking() {
 
       if (response.ok) {
         const data = await response.json();
-        setNotifications(Array.isArray(data) ? data : []);
+        const notifications = Array.isArray(data)
+          ? data.filter((notice) => notice.orderId === orderId)
+          : [];
+        setOrderNotifications(notifications);
       }
     } catch (err) {
       console.error("Failed to load notifications:", err);
@@ -92,14 +97,14 @@ export default function OrderTracking() {
       if (response.ok) {
         const updated = await response.json();
         setOrder(updated);
-        alert("Order cancelled successfully");
+        success("Order cancelled successfully!");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to cancel order");
+        errorNotif(error.message || "Failed to cancel order");
       }
     } catch (err) {
       console.error("Error cancelling order:", err);
-      alert("Error: " + err.message);
+      errorNotif("Error: " + err.message);
     }
   };
 
@@ -109,7 +114,6 @@ export default function OrderTracking() {
     0,
     statusSteps.indexOf(order?.status || "Pending")
   );
-  const orderNotifications = notifications.filter((notice) => notice.orderId === orderId);
   const unreadNotifications = orderNotifications.filter((notice) => !notice.read);
 
   const markOrderNotificationsRead = async () => {
@@ -130,7 +134,7 @@ export default function OrderTracking() {
         )
       );
 
-      setNotifications((prev) =>
+      setOrderNotifications((prev) =>
         prev.map((notice) =>
           unreadNotifications.some((unread) => unread.id === notice.id)
             ? { ...notice, read: true }

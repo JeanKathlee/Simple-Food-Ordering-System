@@ -1,10 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import DeliveryMapPicker from "../components/DeliveryMapPicker";
 import { formatPrice } from "../data/menuItems";
 import { getAuthSession } from "../lib/auth";
+import { useNotification } from "../hooks/useNotification";
+
+function normalizeMobileNumber(value = "") {
+  return value.replace(/[\s-]/g, "");
+}
+
+function isValidMobileNumber(value = "") {
+  const normalized = normalizeMobileNumber(value);
+  return /^(09\d{9}|\+639\d{9}|639\d{9})$/.test(normalized);
+}
 
 export default function Checkout() {
   const navigate = useNavigate();
+  const { success, error: errorNotif, info } = useNotification();
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [couponCode, setCouponCode] = useState("");
@@ -12,11 +24,13 @@ export default function Checkout() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponError, setCouponError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [orderConfirm, setOrderConfirm] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     mobileNumber: "",
     address: "",
+    note: "",
   });
 
   // Load cart gikan API
@@ -109,29 +123,45 @@ export default function Checkout() {
 
   const total = subtotal - discountAmount;
 
-  async function handlePlaceOrder() {
+  function handlePlaceOrder() {
     if (cartItems.length === 0) {
-      alert("Cart is empty");
+      errorNotif("Cart is empty");
       return;
     }
 
     if (!formData.firstName || !formData.lastName || !formData.mobileNumber || !formData.address) {
-      alert("Please fill in all contact details");
+      errorNotif("Please fill in all contact details, search or pin your delivery address, and add any delivery note if needed.");
       return;
     }
 
+    if (!isValidMobileNumber(formData.mobileNumber)) {
+      errorNotif("Please enter a valid mobile number (09XXXXXXXXX or +639XXXXXXXXX).");
+      return;
+    }
+
+    setOrderConfirm(true);
+  }
+
+  async function confirmPlaceOrder() {
     setLoading(true);
     try {
       const session = getAuthSession();
       const token = session?.token;
 
       if (!token) {
-        alert("Please log in to place an order");
+        errorNotif("Please log in to place an order");
         navigate("/login");
         return;
       }
 
       const customerFullName = `${formData.firstName} ${formData.lastName}`;
+      const normalizedMobileNumber = normalizeMobileNumber(formData.mobileNumber);
+
+      if (!isValidMobileNumber(normalizedMobileNumber)) {
+        errorNotif("Please enter a valid mobile number (09XXXXXXXXX or +639XXXXXXXXX).");
+        setOrderConfirm(false);
+        return;
+      }
 
       // Create order
       const response = await fetch("/api/orders", {
@@ -147,12 +177,15 @@ export default function Checkout() {
           couponCode: appliedCoupon?.code || null,
           discount: discountAmount,
           address: formData.address,
-          mobileNumber: formData.mobileNumber,
+          note: formData.note,
+          mobileNumber: normalizedMobileNumber,
         }),
       });
 
       if (response.ok) {
         const order = await response.json();
+        success("Order placed successfully!");
+        setOrderConfirm(false);
 
         await fetch("/api/cart", {
           method: "DELETE",
@@ -164,6 +197,7 @@ export default function Checkout() {
           lastName: "",
           mobileNumber: "",
           address: "",
+          note: "",
         });
         setCouponCode("");
         setAppliedCoupon(null);
@@ -173,11 +207,13 @@ export default function Checkout() {
         navigate(`/order-confirmation/${order.id}`);
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to place order");
+        errorNotif(error.message || "Failed to place order");
+        setOrderConfirm(false);
       }
     } catch (err) {
       console.error("Error placing order:", err);
-      alert("Error: " + err.message);
+      errorNotif("Error: " + err.message);
+      setOrderConfirm(false);
     } finally {
       setLoading(false);
     }
@@ -236,6 +272,10 @@ export default function Checkout() {
                   name="mobileNumber"
                   value={formData.mobileNumber}
                   onChange={handleInputChange}
+                  inputMode="numeric"
+                  pattern="^(09\\d{9}|\\+639\\d{9}|639\\d{9})$"
+                  title="Use 09XXXXXXXXX or +639XXXXXXXXX"
+                  maxLength={13}
                   placeholder="Enter your mobile number"
                 />
               </label>
@@ -247,14 +287,44 @@ export default function Checkout() {
                 <span>Step 2</span>
               </div>
 
-              <p className="checkout-field-label">Delivery Address</p>
-              <textarea
-                className="checkout-address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                placeholder="Enter your delivery address"
-              />
+              <div className="checkout-delivery-grid">
+                <div className="checkout-delivery-form">
+                  <p className="checkout-field-label">Delivery Address</p>
+                  <textarea
+                    className="checkout-address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Enter your delivery address"
+                  />
+
+                  <p className="checkout-field-label">Delivery Note</p>
+                  <textarea
+                    className="checkout-address checkout-note"
+                    name="note"
+                    value={formData.note}
+                    onChange={handleInputChange}
+                    placeholder="Add delivery instructions, landmarks, or special requests"
+                  />
+                </div>
+
+                <div className="checkout-map-card">
+                  <div className="checkout-map-header">
+                    <strong>Delivery Map</strong>
+                    <span>Pin it</span>
+                  </div>
+                  <DeliveryMapPicker
+                    value={formData.address}
+                    onChange={(address) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address,
+                      }))
+                    }
+                  />
+                  <p className="checkout-map-caption">Search a place, tap the map, or drag the pin to auto-fill the address.</p>
+                </div>
+              </div>
             </article>
           </section>
 
@@ -361,6 +431,31 @@ export default function Checkout() {
             </article>
           </aside>
         </div>
+
+        {orderConfirm && (
+          <div className="cart-popup-backdrop" role="presentation" onClick={() => setOrderConfirm(false)}>
+            <section
+              className="panel-card cart-popup"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirm order placement"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div>
+                <h2>Confirm Order</h2>
+                <p>Are you sure you want to place this order for {formatPrice(total)}?</p>
+              </div>
+              <div className="cart-popup-actions">
+                <button type="button" className="client-btn ghost" onClick={() => setOrderConfirm(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="client-btn" onClick={confirmPlaceOrder} disabled={loading}>
+                  {loading ? "Placing..." : "Confirm Order"}
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );

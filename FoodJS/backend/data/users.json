@@ -31,6 +31,7 @@
       "passwordHash": "$2a$10$Un.bEXg/VhXHU6XTBApSDOvQed5nzT5qr2A2EhuSihf7pkMHU/Yya",
       "role": "customer",
       "createdAt": "2026-04-29T16:07:18.409Z"
+      
     },
     {
       "id": 5,
@@ -47,6 +48,23 @@
       "passwordHash": "$2a$10$4U5vLlO619vOnoJ1k7AvUeD6jIue.fZpNZC2XEACz.YizTIlmFgFW",
       "role": "customer",
       "createdAt": "2026-05-07T05:12:47.826Z"
+    },
+    {
+      "id": 7,
+      "name": "jean",
+      "email": "villegasjeankathleen@gmail.xom",
+      "passwordHash": "$2a$10$SP6AGE3WtH7xVr4QpQAwEezumCDWKihMwGaL/AtxVP8ybTfqLHrDi",
+      "role": "customer",
+      "createdAt": "2026-05-07T10:03:17.868Z"
+    },
+    {
+      "id": 8,
+      "name": "jean",
+      "email": "villegasjeankathleen@gmail.com",
+      "passwordHash": "$2a$10$ZPJIyu5quyUZfsE9VwQshOomAubUUfxpsD0Gi7hmibdaNxQcO7qI6",
+      "role": "customer",
+      "createdAt": "2026-05-07T10:07:32.299Z"
+      
     }
   ]
 }

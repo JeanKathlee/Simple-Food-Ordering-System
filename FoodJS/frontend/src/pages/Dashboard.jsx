@@ -11,6 +11,7 @@ import CategoryManagement from "../components/admin/CategoryManagement";
 import CouponManagement from "../components/admin/CouponManagement";
 import PopularItems from "../components/admin/PopularItems";
 import ConfirmModal from "../components/admin/ConfirmModal";
+import { useNotification } from "../hooks/useNotification";
 import "../dashboard.css";
 
 const DEFAULT_STATUS_OPTIONS = ["Pending", "Preparing", "Ready", "Cancelled", "Delivered"];
@@ -112,6 +113,7 @@ function calculateSoldCounts(items = [], allOrders = []) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { success, error: errorNotif, warning: warnNotif } = useNotification();
   const session = useMemo(() => getAuthSession(), []);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [categories, setCategories] = useState([]);
@@ -129,6 +131,7 @@ export default function Dashboard() {
     search: "",
   });
   const [syncLabel, setSyncLabel] = useState("Live sync active");
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [modalConfig, setModalConfig] = useState({
     open: false,
     title: "",
@@ -215,13 +218,13 @@ export default function Dashboard() {
         setAllOrders((prev) =>
           prev.map((order) => (order.id === orderId ? normalized[0] : order))
         );
-        alert("Status updated!");
+        success("Order status updated successfully!");
       } else {
-        alert("Failed to update status");
+        errorNotif("Failed to update order status");
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("Error updating status");
+      errorNotif("Error updating order status");
     }
   };
 
@@ -241,13 +244,13 @@ export default function Dashboard() {
 
       if (response.ok) {
         setAllOrders((prev) => prev.filter((order) => order.id !== orderId));
-        alert("Order deleted successfully!");
+        success("Order deleted successfully!");
       } else {
-        alert("Failed to delete order");
+        errorNotif("Failed to delete order");
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("Error deleting order");
+      errorNotif("Error deleting order");
     }
   };
 
@@ -329,7 +332,12 @@ export default function Dashboard() {
   }, [menuItems, allOrders]);
 
   const handleLogout = () => {
+    setLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     clearAuthSession();
+    setLogoutConfirm(false);
     navigate("/");
   };
 
@@ -351,15 +359,16 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to add menu item");
+        errorNotif(error?.message || "Failed to add menu item");
         return;
       }
 
       const newItem = await response.json();
       setMenuItems((current) => [newItem, ...current]);
+      success("Menu item added successfully!");
       bumpSyncState("menu");
     } catch (err) {
-      alert("Error adding menu item");
+      errorNotif("Error adding menu item");
     }
   };
 
@@ -377,7 +386,7 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to update menu item");
+        errorNotif(error?.message || "Failed to update menu item");
         return;
       }
 
@@ -385,9 +394,10 @@ export default function Dashboard() {
       setMenuItems((current) =>
         current.map((item) => (item.id === id ? updatedItem : item))
       );
+      success("Menu item updated successfully!");
       bumpSyncState("menu");
     } catch (err) {
-      alert("Error updating menu item");
+      errorNotif("Error updating menu item");
     }
   };
 
@@ -409,15 +419,16 @@ export default function Dashboard() {
 
           if (!response.ok) {
             const error = await response.json();
-            alert(error?.message || "Failed to delete menu item");
+            errorNotif(error?.message || "Failed to delete menu item");
             return;
           }
 
           setMenuItems((current) => current.filter((item) => item.id !== id));
           setModalConfig((current) => ({ ...current, open: false }));
+          success("Menu item deleted successfully!");
           bumpSyncState("menu");
         } catch (err) {
-          alert("Error deleting menu item");
+          errorNotif("Error deleting menu item");
           setModalConfig((current) => ({ ...current, open: false }));
         }
       },
@@ -438,15 +449,16 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to add category");
+        errorNotif(error?.message || "Failed to add category");
         return;
       }
 
       const newCategory = await response.json();
       setCategories((current) => [newCategory, ...current]);
+      success("Category added successfully!");
       bumpSyncState("categories");
     } catch (err) {
-      alert("Error adding category");
+      errorNotif("Error adding category");
     }
   };
 
@@ -464,7 +476,7 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to update category");
+        errorNotif(error?.message || "Failed to update category");
         return;
       }
 
@@ -472,15 +484,16 @@ export default function Dashboard() {
       setCategories((current) =>
         current.map((category) => (category.id === id ? updatedCategory : category))
       );
+      success("Category updated successfully!");
       bumpSyncState("categories");
     } catch (err) {
-      alert("Error updating category");
+      errorNotif("Error updating category");
     }
   };
 
   const handleDeleteCategory = async (id, itemCount) => {
     if (itemCount > 0) {
-      alert("Cannot delete category with items. Remove items first.");
+      warnNotif("Cannot delete category with items. Remove items first.");
       return;
     }
 
@@ -501,16 +514,17 @@ export default function Dashboard() {
 
           if (!response.ok) {
             const error = await response.json();
-            alert(error?.message || "Failed to delete category");
+            errorNotif(error?.message || "Failed to delete category");
             setModalConfig((current) => ({ ...current, open: false }));
             return;
           }
 
           setCategories((current) => current.filter((category) => category.id !== id));
           setModalConfig((current) => ({ ...current, open: false }));
+          success("Category deleted successfully!");
           bumpSyncState("categories");
         } catch (err) {
-          alert("Error deleting category");
+          errorNotif("Error deleting category");
           setModalConfig((current) => ({ ...current, open: false }));
         }
       },
@@ -531,15 +545,16 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to add coupon");
+        errorNotif(error?.message || "Failed to add coupon");
         return;
       }
 
       const newCoupon = await response.json();
       setCoupons((current) => [newCoupon, ...current]);
+      success("Coupon added successfully!");
       bumpSyncState("coupons");
     } catch (err) {
-      alert("Error adding coupon");
+      errorNotif("Error adding coupon");
     }
   };
 
@@ -557,7 +572,7 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error?.message || "Failed to update coupon");
+        errorNotif(error?.message || "Failed to update coupon");
         return;
       }
 
@@ -565,9 +580,10 @@ export default function Dashboard() {
       setCoupons((current) =>
         current.map((coupon) => (coupon.id === id ? updatedCoupon : coupon))
       );
+      success("Coupon updated successfully!");
       bumpSyncState("coupons");
     } catch (err) {
-      alert("Error updating coupon");
+      errorNotif("Error updating coupon");
     }
   };
 
@@ -589,16 +605,17 @@ export default function Dashboard() {
 
           if (!response.ok) {
             const error = await response.json();
-            alert(error?.message || "Failed to delete coupon");
+            errorNotif(error?.message || "Failed to delete coupon");
             setModalConfig((current) => ({ ...current, open: false }));
             return;
           }
 
           setCoupons((current) => current.filter((coupon) => coupon.id !== id));
           setModalConfig((current) => ({ ...current, open: false }));
+          success("Coupon deleted successfully!");
           bumpSyncState("coupons");
         } catch (err) {
-          alert("Error deleting coupon");
+          errorNotif("Error deleting coupon");
           setModalConfig((current) => ({ ...current, open: false }));
         }
       },
@@ -698,6 +715,14 @@ export default function Dashboard() {
         )}
       </main>
 
+      <ConfirmModal
+        open={logoutConfirm}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        confirmLabel="Logout"
+        onCancel={() => setLogoutConfirm(false)}
+        onConfirm={confirmLogout}
+      />
       <ConfirmModal
         open={modalConfig.open}
         title={modalConfig.title}

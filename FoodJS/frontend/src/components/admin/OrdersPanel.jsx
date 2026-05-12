@@ -15,6 +15,18 @@ function formatCurrency(value) {
   }).format(value);
 }
 
+function getNextStatusOptions(currentStatus) {
+  const transitionMap = {
+    Pending: ["Preparing", "Cancelled"],
+    Preparing: ["Ready", "Cancelled"],
+    Ready: ["Delivered"],
+    Delivered: [],
+    Cancelled: [],
+  };
+
+  return transitionMap[currentStatus] || [];
+}
+
 export default function OrdersPanel({
   orders,
   statusOptions,
@@ -125,8 +137,14 @@ export default function OrdersPanel({
                   <td>{formatDate(order.createdAt)}</td>
                   {isAdmin && (
                     <td>
+                      {(() => {
+                        const nextOptions = getNextStatusOptions(order.status);
+                        const isLocked = nextOptions.length === 0;
+
+                        return (
                       <select
                         value=""
+                        disabled={isLocked}
                         onChange={(e) => {
                           if (e.target.value && onUpdateStatus) {
                             onUpdateStatus(order.id, e.target.value);
@@ -141,13 +159,15 @@ export default function OrdersPanel({
                           fontSize: "12px",
                         }}
                       >
-                        <option value="">Change...</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Preparing">Preparing</option>
-                        <option value="Ready">Ready</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option value="">{isLocked ? "Locked" : "Change..."}</option>
+                        {nextOptions.map((nextStatus) => (
+                          <option value={nextStatus} key={nextStatus}>
+                            {nextStatus}
+                          </option>
+                        ))}
                       </select>
+                        );
+                      })()}
                     </td>
                   )}
                   {isAdmin && (

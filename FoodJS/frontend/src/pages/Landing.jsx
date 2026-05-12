@@ -81,6 +81,54 @@ const bestSellers = [
   },
 ];
 
+const howItWorks = [
+  {
+    step: 1,
+    title: "Browse Menu",
+    description: "Explore thousands of items across all categories.",
+    icon: "🔍",
+  },
+  {
+    step: 2,
+    title: "Add to Cart",
+    description: "Pick your favorites and customize as needed.",
+    icon: "🛒",
+  },
+  {
+    step: 3,
+    title: "Checkout",
+    description: "Fast, secure payment with multiple options.",
+    icon: "💳",
+  },
+  {
+    step: 4,
+    title: "Track & Enjoy",
+    description: "Real-time updates until it arrives at your door.",
+    icon: "📍",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Maria Santos",
+    role: "Food Lover",
+    text: "The best food delivery app I've used. Fast, reliable, and the food tastes amazing!",
+    avatar: "👩",
+  },
+  {
+    name: "Juan Dela Cruz",
+    role: "Busy Professional",
+    text: "Saves me so much time. Great variety and consistently excellent service.",
+    avatar: "👨",
+  },
+  {
+    name: "Rosa Miguel",
+    role: "Family of 4",
+    text: "Perfect for family orders. Coupons and deals make it even better!",
+    avatar: "👩‍🦰",
+  },
+];
+
 export default function Landing() {
   const navigate = useNavigate();
 
@@ -215,6 +263,71 @@ export default function Landing() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="landing-trust-section">
+          <div className="trust-grid">
+            <div className="trust-card">
+              <h4>50K+</h4>
+              <p>Happy Customers</p>
+            </div>
+            <div className="trust-card">
+              <h4>4.8★</h4>
+              <p>Average Rating</p>
+            </div>
+            <div className="trust-card">
+              <h4>30 mins</h4>
+              <p>Avg Delivery Time</p>
+            </div>
+            <div className="trust-card">
+              <h4>100%</h4>
+              <p>Fresh Guarantee</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-section landing-how-it-works">
+          <div className="section-title-row">
+            <h3>How It Works</h3>
+            <p>Four simple steps to delicious food at your door.</p>
+          </div>
+          <div className="how-it-works-grid">
+            {howItWorks.map((item) => (
+              <div key={item.step} className="how-it-works-card">
+                <div className="how-it-works-icon">{item.icon}</div>
+                <h4>{item.title}</h4>
+                <p>{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-section landing-testimonials">
+          <div className="section-title-row">
+            <h3>What Customers Say</h3>
+            <p>Real feedback from real FoodJS lovers.</p>
+          </div>
+          <div className="testimonials-grid">
+            {testimonials.map((testimonial) => (
+              <article key={testimonial.name} className="testimonial-card">
+                <div className="testimonial-header">
+                  <span className="testimonial-avatar">{testimonial.avatar}</span>
+                  <div>
+                    <h4>{testimonial.name}</h4>
+                    <p>{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="testimonial-text">"{testimonial.text}"</p>
+                <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-final-cta">
+          <h3>Ready to order?</h3>
+          <p>Join thousands of satisfied customers. Order now and get 10% off your first order!</p>
+          <Link className="landing-cta-btn" to="/login">Start Ordering Now</Link>
         </section>
       </main>
     </div>

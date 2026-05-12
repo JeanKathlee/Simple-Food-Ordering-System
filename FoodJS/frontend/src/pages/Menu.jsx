@@ -9,13 +9,16 @@ import {
   enrichMenuWithImages,
   formatPrice,
 } from "../data/menuItems";
+import { useNotification } from "../hooks/useNotification";
 
 export default function Menu() {
   const navigate = useNavigate();
+  const { success, error: errorNotif } = useNotification();
   const [menuItems, setMenuItems] = useState([]);
   const [tabs, setTabs] = useState(["All"]);
   const [activeTab, setActiveTab] = useState("All");
   const [query, setQuery] = useState("");
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBag, setShowBag] = useState(false);
@@ -73,8 +76,19 @@ export default function Menu() {
   }, [activeTab, query, menuItems]);
 
   const handleLogout = () => {
+    setLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     clearAuthSession();
+    setLogoutConfirm(false);
     navigate("/");
+  };
+
+  const openProductDetails = (item) => {
+    navigate(`/product/${encodeURIComponent(item.name)}`, {
+      state: { item },
+    });
   };
 
   const addToCart = async (item) => {
@@ -83,7 +97,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to add items to cart");
+        errorNotif("Please log in to add items to cart");
         return;
       }
 
@@ -104,12 +118,13 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to add to cart:", response.status, error);
-        alert(error?.message || "Failed to add item to cart");
+        errorNotif(error?.message || "Failed to add item to cart");
         return;
       }
 
       // Add or update in local state
       setCartItems((prev) => {
+        success(`${item.name} added to cart!`);
         const existing = prev.find((cart) => cart.menuItemId === item.id);
         if (existing) {
           return prev.map((cart) =>
@@ -132,7 +147,7 @@ export default function Menu() {
       });
     } catch (err) {
       console.error("Failed to add to cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -147,7 +162,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to update cart");
+        errorNotif("Please log in to update cart");
         return;
       }
 
@@ -163,7 +178,7 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to update cart:", response.status, error);
-        alert(error?.message || "Failed to update cart item");
+        errorNotif(error?.message || "Failed to update cart item");
         return;
       }
 
@@ -174,9 +189,10 @@ export default function Menu() {
             : item
         )
       );
+      success("Cart updated successfully!");
     } catch (err) {
       console.error("Failed to update cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -186,7 +202,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to remove items from cart");
+        errorNotif("Please log in to remove items from cart");
         return;
       }
 
@@ -200,16 +216,17 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to remove from cart:", response.status, error);
-        alert(error?.message || "Failed to remove from cart");
+        errorNotif(error?.message || "Failed to remove from cart");
         return;
       }
 
       setCartItems((prev) =>
         prev.filter((item) => item.menuItemId !== menuItemId)
       );
+      success("Item removed from cart");
     } catch (err) {
       console.error("Failed to remove from cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -219,7 +236,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to clear cart");
+        errorNotif("Please log in to clear cart");
         return;
       }
 
@@ -233,14 +250,15 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to clear cart:", response.status, error);
-        alert(error?.message || "Failed to clear cart");
+        errorNotif(error?.message || "Failed to clear cart");
         return;
       }
 
       setCartItems([]);
+      success("Cart cleared successfully!");
     } catch (err) {
       console.error("Failed to clear cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -385,7 +403,14 @@ export default function Menu() {
             <div className="menu-grid">
               {visibleItems.map((item) => (
                 <article key={item.name} className="menu-card">
-                  <img src={item.image} alt={item.name} className="menu-card-image" />
+                  <button
+                    type="button"
+                    className="menu-card-image-button"
+                    onClick={() => openProductDetails(item)}
+                    aria-label={`View ${item.name} details`}
+                  >
+                    <img src={item.image} alt={item.name} className="menu-card-image" />
+                  </button>
                   <div className="menu-card-body">
                     <h3>{item.name}</h3>
                     <p>{item.description || "Freshly prepared and served hot."}</p>
@@ -393,18 +418,7 @@ export default function Menu() {
                   <div className="menu-card-footer">
                     <strong>{formatPrice(item.price)}</strong>
                     <div className="menu-card-actions">
-                      <button
-                        type="button"
-                        className="client-btn ghost"
-                        onClick={() =>
-                          navigate(`/product/${encodeURIComponent(item.name)}`, {
-                            state: { item },
-                          })
-                        }
-                      >
-                        View
-                      </button>
-                      <button type="button" className="client-btn primary" onClick={() => addToCart(item)}>
+                      <button type="button" className="client-btn primary" onClick={() => openProductDetails(item)}>
                         Add to cart
                       </button>
                     </div>
@@ -421,6 +435,29 @@ export default function Menu() {
             </div>
 
           </section>
+        )}
+
+        {logoutConfirm && (
+          <div className="cart-popup-backdrop" role="presentation" onClick={() => setLogoutConfirm(false)}>
+            <section
+              className="panel-card cart-popup"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirm logout"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div>
+                <h2>Confirm Logout</h2>
+                <p>Are you sure you want to logout?</p>
+              </div>
+              <div className="cart-popup-actions">
+                <button type="button" className="client-btn ghost" onClick={() => setLogoutConfirm(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="client-btn" onClick={confirmLogout}>Logout</button>
+              </div>
+            </section>
+          </div>
         )}
       </div>
     </div>

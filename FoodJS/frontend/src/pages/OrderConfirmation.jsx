@@ -59,7 +59,15 @@ export default function OrderConfirmation() {
           </div>
           <div className="page-actions">
             <button className="client-btn ghost" onClick={() => navigate("/menu")}>Menu</button>
-            <button className="client-btn ghost" onClick={() => navigate("/")}>Home</button>
+            <button
+              className="client-btn ghost"
+              onClick={() => {
+                const session = getAuthSession();
+                navigate(session?.token ? "/menu" : "/");
+              }}
+            >
+              Home
+            </button>
           </div>
         </header>
 
