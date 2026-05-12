@@ -323,7 +323,8 @@
 .admin-order-filters input,
 .admin-order-filters select,
 .admin-form-grid input,
-.admin-form-grid select {
+.admin-form-grid select,
+.admin-form-grid textarea {
   border: 1px solid #e8d6c3;
   background: #fffaf5;
   border-radius: 10px;
@@ -332,13 +333,45 @@
   font-family: inherit;
 }
 
+.admin-form-grid textarea {
+  min-height: 80px;
+  padding: 10px;
+  resize: vertical;
+}
+
 .admin-order-filters input:focus,
 .admin-order-filters select:focus,
 .admin-form-grid input:focus,
-.admin-form-grid select:focus {
+.admin-form-grid select:focus,
+.admin-form-grid textarea:focus {
   outline: none;
   border-color: var(--admin-primary-strong);
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.admin-file-input {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 6px 12px;
+  padding-right: 14px;
+  min-width: 250px;
+}
+
+.admin-file-input::file-selector-button {
+  border: 1px solid #d7d7df;
+  background: #ececef;
+  color: #2f2f33;
+  border-radius: 8px;
+  min-height: 32px;
+  padding: 0 12px;
+  margin-right: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-file-input::file-selector-button:hover {
+  background: #e2e2e8;
 }
 
 .admin-category-form {
@@ -357,6 +390,18 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.admin-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-form-footer .admin-form-actions {
+  margin-left: auto;
 }
 
 .admin-btn {
@@ -592,6 +637,10 @@
 
   .admin-category-form {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-form-footer .admin-form-actions {
+    margin-left: 0;
   }
 }
 

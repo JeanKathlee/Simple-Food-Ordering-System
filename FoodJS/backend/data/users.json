@@ -31,7 +31,6 @@
       "passwordHash": "$2a$10$Un.bEXg/VhXHU6XTBApSDOvQed5nzT5qr2A2EhuSihf7pkMHU/Yya",
       "role": "customer",
       "createdAt": "2026-04-29T16:07:18.409Z"
-      
     },
     {
       "id": 5,
@@ -64,7 +63,18 @@
       "passwordHash": "$2a$10$ZPJIyu5quyUZfsE9VwQshOomAubUUfxpsD0Gi7hmibdaNxQcO7qI6",
       "role": "customer",
       "createdAt": "2026-05-07T10:07:32.299Z"
-      
+    },
+    {
+      "id": 9,
+      "firstName": "JEAN",
+      "lastName": "VILLEGAS",
+      "name": "JEAN VILLEGAS",
+      "email": "jeankathleen.villegas.23@usjr.edu.ph",
+      "passwordHash": "$2a$10$bC/2Ai5/bi32qaf7V/.SN.aBQySv6sBycCGhdBo0BaYzneDp64CmW",
+      "role": "customer",
+      "mobileNumber": "",
+      "address": "",
+      "createdAt": "2026-05-12T10:20:47.107Z"
     }
   ]
 }

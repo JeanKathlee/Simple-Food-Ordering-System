@@ -45,6 +45,10 @@ function matchesDate(dateValue, fromDate, toDate) {
   return true;
 }
 
+function compareOrdersNewestFirst(a, b) {
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+}
+
 function normalizeMenu(items = [], categories = []) {
   return items.map((item, index) => {
     const category = categories.find(
@@ -269,38 +273,42 @@ export default function Dashboard() {
     const customerFilter = filters.customer.trim().toLowerCase();
     const searchFilter = filters.search.trim().toLowerCase();
 
-    return orders.filter((order) => {
-      const statusMatch = filters.status === "All" || order.status === filters.status;
-      const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
-      const customerMatch =
-        !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
+    return orders
+      .filter((order) => {
+        const statusMatch = filters.status === "All" || order.status === filters.status;
+        const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
+        const customerMatch =
+          !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
 
-      const searchMatch =
-        !searchFilter ||
-        order.id.toLowerCase().includes(searchFilter) ||
-        order.customerName.toLowerCase().includes(searchFilter);
+        const searchMatch =
+          !searchFilter ||
+          order.id.toLowerCase().includes(searchFilter) ||
+          order.customerName.toLowerCase().includes(searchFilter);
 
-      return statusMatch && dateMatch && customerMatch && searchMatch;
-    });
+        return statusMatch && dateMatch && customerMatch && searchMatch;
+      })
+      .sort(compareOrdersNewestFirst);
   }, [filters, orders]);
 
   const filteredAdminOrders = useMemo(() => {
     const customerFilter = filters.customer.trim().toLowerCase();
     const searchFilter = filters.search.trim().toLowerCase();
 
-    return allOrders.filter((order) => {
-      const statusMatch = filters.status === "All" || order.status === filters.status;
-      const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
-      const customerMatch =
-        !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
+    return allOrders
+      .filter((order) => {
+        const statusMatch = filters.status === "All" || order.status === filters.status;
+        const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
+        const customerMatch =
+          !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
 
-      const searchMatch =
-        !searchFilter ||
-        order.id.toLowerCase().includes(searchFilter) ||
-        order.customerName.toLowerCase().includes(searchFilter);
+        const searchMatch =
+          !searchFilter ||
+          order.id.toLowerCase().includes(searchFilter) ||
+          order.customerName.toLowerCase().includes(searchFilter);
 
-      return statusMatch && dateMatch && customerMatch && searchMatch;
-    });
+        return statusMatch && dateMatch && customerMatch && searchMatch;
+      })
+      .sort(compareOrdersNewestFirst);
   }, [filters, allOrders]);
 
   const dashboardStats = useMemo(() => {

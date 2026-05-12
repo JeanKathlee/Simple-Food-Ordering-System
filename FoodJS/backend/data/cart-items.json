@@ -17,6 +17,15 @@
       "quantity": 1,
       "selectedChoice": null,
       "updatedAt": "2026-05-07T10:03:33.730Z"
+    },
+    {
+      "userId": 8,
+      "menuItemId": "M-1003",
+      "name": "Classic Cheese Burger",
+      "price": 129,
+      "quantity": 2,
+      "selectedChoice": "Go Regular Iced Tea",
+      "updatedAt": "2026-05-12T10:14:46.531Z"
     }
   ]
 }

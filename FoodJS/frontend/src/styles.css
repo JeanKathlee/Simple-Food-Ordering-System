@@ -153,6 +153,16 @@ body {
   position: relative;
 }
 
+.auth-name-row {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-name-row .input-group {
+  flex: 1;
+  min-width: 0;
+}
+
 .row {
   display: flex;
   gap: 12px;
@@ -241,6 +251,13 @@ body {
   color: #e11d48;
   font-size: 13px;
   text-align: center;
+}
+
+@media (max-width: 520px) {
+  .auth-name-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 .dashboard {
@@ -2439,6 +2456,19 @@ body {
   box-shadow: 0 12px 24px rgba(165, 92, 22, 0.08);
 }
 
+.client-page .page-topbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.client-page .page-topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, #ffb56b 0%, #f07c21 100%);
+}
+
 .page-topbar h1 {
   font-size: 28px;
   font-family: "Baloo 2", sans-serif;
@@ -2507,6 +2537,18 @@ body {
   border-radius: 18px;
   padding: 18px;
   box-shadow: 0 12px 24px rgba(140, 77, 22, 0.06);
+}
+
+.order-page .panel-card,
+.tracking-page .panel-card,
+.history-page .panel-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.order-page .panel-card:hover,
+.tracking-page .panel-card:hover,
+.history-page .panel-card:hover {
+  box-shadow: 0 16px 30px rgba(140, 77, 22, 0.09);
 }
 
 .empty-state {
@@ -2651,6 +2693,10 @@ body {
   background: linear-gradient(130deg, #fff1e0 0%, #fff8f2 100%);
 }
 
+.order-page .order-hero {
+  border-left: 5px solid #f0a253;
+}
+
 .order-hero-label {
   display: inline-flex;
   align-items: center;
@@ -2767,6 +2813,13 @@ body {
   gap: 12px;
 }
 
+.order-detail-grid > div {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fffaf5;
+  border: 1px solid #f3e1cf;
+}
+
 .order-detail-grid span {
   font-size: 12px;
   color: #7a5636;
@@ -2778,6 +2831,10 @@ body {
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid #f1e0cf;
+}
+
+.order-items .order-item-row:last-of-type {
+  border-bottom: none;
 }
 
 .order-item-row p {
@@ -2860,6 +2917,10 @@ body {
   color: #2a1406;
 }
 
+.status-step.active span {
+  color: #3f2a17;
+}
+
 .status-bar {
   position: absolute;
   left: 10%;
@@ -2887,6 +2948,10 @@ body {
   background: #fff5ea;
   border: 1px solid #f2dcc6;
   margin-bottom: 16px;
+}
+
+.tracking-page .tracking-status-card {
+  border-left: 5px solid #f0a253;
 }
 
 .tracking-status-card h2 {
@@ -2941,6 +3006,11 @@ body {
   border: 1px solid #f1e0cf;
   font-size: 12px;
   color: #6f4a2a;
+}
+
+.notification-item:hover {
+  border-color: #efb37d;
+  background: #fff8f1;
 }
 
 .notification-item.unread {
@@ -3023,6 +3093,13 @@ body {
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  border-left: 5px solid transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.history-card:hover {
+  transform: translateY(-2px);
+  border-left-color: #f0a253;
 }
 
 .history-card h3 {

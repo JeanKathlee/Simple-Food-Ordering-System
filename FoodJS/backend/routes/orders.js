@@ -13,6 +13,12 @@ const ORDER_STATUS_TRANSITIONS = {
   Cancelled: [],
 };
 
+function sortOrdersNewestFirst(orders = []) {
+  return [...orders].sort(
+    (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  );
+}
+
 function appendStatusHistory(order, { fromStatus, toStatus, actorId, actorRole, source }) {
   if (!Array.isArray(order.statusHistory)) {
     order.statusHistory = [];
@@ -104,14 +110,16 @@ router.get('/', verifyToken, (req, res) => {
   const userId = req.user.sub;
   const data = readJsonFromData('orders.json');
   
-  const userOrders = (data.orders || []).filter(order => order.userId === userId);
+  const userOrders = sortOrdersNewestFirst(
+    (data.orders || []).filter(order => order.userId === userId)
+  );
   res.json(userOrders);
 });
 
 // GET - get all orders admin onle
 router.get('/admin/all', verifyToken, requireAdmin, (req, res) => {
   const data = readJsonFromData('orders.json');
-  res.json(data.orders || []);
+  res.json(sortOrdersNewestFirst(data.orders || []));
 });
 
 // GET - get specific order

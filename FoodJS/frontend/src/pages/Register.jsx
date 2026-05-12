@@ -7,7 +7,8 @@ import logo from "../../assets/logo.png";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,7 +45,8 @@ export default function Register() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
+          firstName,
+          lastName,
           email,
           password,
         }),
@@ -88,15 +90,28 @@ export default function Register() {
 
         <h2 className="auth-title">CREATE ACCOUNT</h2>
 
-        <div className="input-group">
-          <input
-            className="input"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <span className="icon">👤</span>
+        <div className="auth-name-row">
+          <div className="input-group">
+            <input
+              className="input"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+            <span className="icon">👤</span>
+          </div>
+
+          <div className="input-group">
+            <input
+              className="input"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+            <span className="icon">👤</span>
+          </div>
         </div>
 
         <div className="input-group">

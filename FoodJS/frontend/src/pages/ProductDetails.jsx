@@ -138,7 +138,14 @@ export default function ProductDetails() {
                 <p>{addedItemName} has been added to your cart.</p>
               </div>
               <div className="cart-popup-actions">
-                <button type="button" className="client-btn ghost" onClick={() => setShowFirstAddPopup(false)}>
+                <button
+                  type="button"
+                  className="client-btn ghost"
+                  onClick={() => {
+                    setShowFirstAddPopup(false);
+                    navigate("/menu");
+                  }}
+                >
                   Continue shopping
                 </button>
                 <button type="button" className="client-btn" onClick={() => navigate("/cart")}>Go to cart</button>

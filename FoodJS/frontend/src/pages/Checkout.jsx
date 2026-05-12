@@ -54,13 +54,34 @@ export default function Checkout() {
           setCartItems(data || []);
         }
 
-        // input form gamit user data
-        if (session?.user) {
-          const names = session.user.name.split(" ");
+        const profileResponse = await fetch("/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (profileResponse.ok) {
+          const profile = await profileResponse.json();
           setFormData((prev) => ({
             ...prev,
-            firstName: names[0] || "",
-            lastName: names.slice(1).join(" ") || "",
+            firstName: profile.firstName || "",
+            lastName: profile.lastName || "",
+            mobileNumber: profile.mobileNumber || "",
+            address: profile.address || "",
+          }));
+          return;
+        }
+
+        // input form gamit user data
+        if (session?.user) {
+          const fullName = session.user.name || "";
+          const names = fullName.split(" ").filter(Boolean);
+          setFormData((prev) => ({
+            ...prev,
+            firstName: session.user.firstName || names[0] || "",
+            lastName: session.user.lastName || names.slice(1).join(" ") || "",
+            mobileNumber: session.user.mobileNumber || "",
+            address: session.user.address || "",
           }));
         }
       } catch (err) {

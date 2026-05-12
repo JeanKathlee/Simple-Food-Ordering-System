@@ -3,10 +3,37 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { readJsonFromData } = require('../lib/readJson');
 const { writeJsonToData } = require('../lib/writeJson');
+const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+
+function splitLegacyName(name = '') {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' ') || '',
+  };
+}
+
+function buildSafeUser(user = {}) {
+  const derived = splitLegacyName(user.name);
+  const firstName = user.firstName || derived.firstName;
+  const lastName = user.lastName || derived.lastName;
+
+  return {
+    id: user.id,
+    firstName,
+    lastName,
+    name: `${firstName} ${lastName}`.trim() || user.name || '',
+    email: user.email,
+    role: user.role,
+    mobileNumber: user.mobileNumber || '',
+    address: user.address || '',
+    createdAt: user.createdAt,
+  };
+}
 
 // Generate ID sa user
 function getNextUserId() {
@@ -17,10 +44,14 @@ function getNextUserId() {
 
 // POST method, Create new user account
 router.post('/register', async (req, res) => {
-  const { email, password, name } = req.body || {};
+  const { email, password, firstName, lastName, mobileNumber, address } = req.body || {};
+  const cleanFirstName = String(firstName || '').trim();
+  const cleanLastName = String(lastName || '').trim();
 
-  if (!email || !password || !name) {
-    return res.status(400).json({ message: 'Email, password, and name are required.' });
+  if (!email || !password || !cleanFirstName || !cleanLastName) {
+    return res
+      .status(400)
+      .json({ message: 'Email, password, first name, and last name are required.' });
   }
 
   if (password.length < 6) {
@@ -41,10 +72,14 @@ router.post('/register', async (req, res) => {
 
   const newUser = {
     id: getNextUserId(),
-    name,
+    firstName: cleanFirstName,
+    lastName: cleanLastName,
+    name: `${cleanFirstName} ${cleanLastName}`.trim(),
     email,
     passwordHash,
     role: 'customer',
+    mobileNumber: mobileNumber || '',
+    address: address || '',
     createdAt: new Date().toISOString(),
   };
 
@@ -62,12 +97,7 @@ router.post('/register', async (req, res) => {
   return res.status(201).json({
     message: 'Account created successfully.',
     token,
-    user: {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    },
+    user: buildSafeUser(newUser),
   });
 });
 
@@ -103,19 +133,25 @@ router.post('/login', async (req, res) => {
   return res.json({
     message: 'Login successful.',
     token,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
+    user: buildSafeUser(user),
   });
 });
 
 router.get('/', (_req, res) => {
   const data = readJsonFromData('users.json');
-  const safeUsers = (data.users || []).map(({ passwordHash, ...user }) => user);
+  const safeUsers = (data.users || []).map(({ passwordHash, ...user }) => buildSafeUser(user));
   res.json(safeUsers);
+});
+
+router.get('/me', verifyToken, (req, res) => {
+  const data = readJsonFromData('users.json');
+  const currentUser = (data.users || []).find((user) => user.id === req.user.sub);
+
+  if (!currentUser) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+
+  return res.json(buildSafeUser(currentUser));
 });
 
 module.exports = router;

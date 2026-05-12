@@ -124,10 +124,10 @@ export default function MenuManagement({
         />
 
         <textarea
+          className="admin-form-textarea"
           placeholder="Item description"
           value={form.description}
           onChange={(event) => handleInput("description", event.target.value)}
-          style={{ minHeight: "80px", fontFamily: "inherit", padding: "8px" }}
         />
 
         <select
@@ -157,43 +157,46 @@ export default function MenuManagement({
           onChange={(event) => handleInput("prepTime", event.target.value)}
         />
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          ref={fileInputRef}
-        />
-
-        {form.imagePreview && (
-          <img
-            src={form.imagePreview}
-            alt="Preview"
-            style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "4px" }}
-          />
-        )}
-
-        <label className="admin-checkbox-row">
+        <div className="admin-form-footer">
           <input
-            type="checkbox"
-            checked={form.isAvailable}
-            onChange={(event) => handleInput("isAvailable", event.target.checked)}
+            className="admin-file-input"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={fileInputRef}
           />
-          <span>Available</span>
-        </label>
 
-        <div className="admin-form-actions">
-          <button type="submit" className="admin-btn admin-btn-primary">
-            {editId ? "Save Item" : "Add Item"}
-          </button>
-          {editId ? (
-            <button
-              type="button"
-              className="admin-btn admin-btn-light"
-              onClick={resetForm}
-            >
-              Cancel Edit
+          {form.imagePreview && (
+            <img
+              src={form.imagePreview}
+              alt="Preview"
+              style={{ width: "56px", height: "56px", objectFit: "cover", borderRadius: "8px" }}
+            />
+          )}
+
+          <label className="admin-checkbox-row">
+            <input
+              type="checkbox"
+              checked={form.isAvailable}
+              onChange={(event) => handleInput("isAvailable", event.target.checked)}
+            />
+            <span>Available</span>
+          </label>
+
+          <div className="admin-form-actions">
+            <button type="submit" className="admin-btn admin-btn-primary">
+              {editId ? "Save Item" : "Add Item"}
             </button>
-          ) : null}
+            {editId ? (
+              <button
+                type="button"
+                className="admin-btn admin-btn-light"
+                onClick={resetForm}
+              >
+                Cancel Edit
+              </button>
+            ) : null}
+          </div>
         </div>
       </form>
 
