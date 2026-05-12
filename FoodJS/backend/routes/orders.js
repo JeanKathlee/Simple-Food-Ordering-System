@@ -2,6 +2,7 @@ const express = require('express');
 const { readJsonFromData } = require('../lib/readJson');
 const { writeJsonToData } = require('../lib/writeJson');
 const { verifyToken, requireAdmin } = require('../middleware/auth');
+const { sendStatusEmail } = require('../lib/emailer');
 
 const router = express.Router();
 const ALLOWED_ORDER_STATUSES = ['Pending', 'Preparing', 'Ready', 'Delivered', 'Cancelled'];
@@ -99,7 +100,17 @@ function recordStatusNotification(order, nextStatus) {
 
     writeJsonToData('notifications.json', { notifications });
 
-    console.log(`[Email notification] to ${email}: ${message}`);
+    if (email && email !== 'unknown') {
+      sendStatusEmail({
+        to: email,
+        subject: 'FoodJS order status update',
+        text: message,
+      }).catch((err) => {
+        console.error('Failed to send status email:', err.message);
+      });
+    } else {
+      console.warn('Missing email for order notification');
+    }
   } catch (err) {
     console.error('Failed to record notification:', err.message);
   }
@@ -140,7 +151,16 @@ router.get('/:id', verifyToken, (req, res) => {
 // POST - Create new order
 router.post('/', verifyToken, (req, res) => {
   const userId = req.user.sub;
-  const { items, customerName, paymentMethod, couponCode, discount } = req.body || {};
+  const {
+    items,
+    customerName,
+    paymentMethod,
+    couponCode,
+    discount,
+    address,
+    note,
+    mobileNumber,
+  } = req.body || {};
   
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Items are required.' });
@@ -163,6 +183,9 @@ router.post('/', verifyToken, (req, res) => {
     total: Math.max(0, total),
     couponCode: couponCode || null,
     paymentMethod: paymentMethod || 'cash',
+    address: address || '',
+    note: note || '',
+    mobileNumber: mobileNumber || '',
     status: 'Pending',
     statusHistory: [],
     createdAt: new Date().toISOString(),
@@ -180,6 +203,42 @@ router.post('/', verifyToken, (req, res) => {
   const data = readJsonFromData('orders.json');
   data.orders.push(newOrder);
   writeJsonToData('orders.json', data);
+
+  recordStatusNotification(newOrder, newOrder.status);
+
+  if (address || mobileNumber) {
+    try {
+      const userData = readJsonFromData('users.json');
+      const user = (userData.users || []).find((entry) => entry.id === userId);
+
+      if (user) {
+        const cleanAddress = String(address || '').trim();
+        const cleanMobile = String(mobileNumber || '').trim();
+
+        if (cleanAddress) {
+          user.lastOrderAddress = cleanAddress;
+          if (!Array.isArray(user.addressBook)) {
+            user.addressBook = [];
+          }
+          const hasAddress = user.addressBook.some(
+            (entry) => String(entry || '').toLowerCase() === cleanAddress.toLowerCase()
+          );
+          const defaultAddress = String(user.address || '').trim();
+          if (!hasAddress && cleanAddress && cleanAddress !== defaultAddress) {
+            user.addressBook.push(cleanAddress);
+          }
+        }
+
+        if (cleanMobile) {
+          user.lastOrderMobileNumber = cleanMobile;
+        }
+
+        writeJsonToData('users.json', userData);
+      }
+    } catch (err) {
+      console.error('Failed to update user profile from order:', err.message);
+    }
+  }
   
   if (couponCode) {
     try {

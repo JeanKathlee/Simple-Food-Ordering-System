@@ -75,6 +75,22 @@
       "mobileNumber": "",
       "address": "",
       "createdAt": "2026-05-12T10:20:47.107Z"
+    },
+    {
+      "id": 10,
+      "firstName": "Brian Joseph",
+      "lastName": "Aratia",
+      "name": "Brian Joseph Aratia",
+      "email": "brianjosepharatia@gmail.com",
+      "passwordHash": "$2a$10$9OCGyVlPwkJ18N4rUWGH0OlnSoqXNogTnquaLuS.NSkt3hJav23jC",
+      "role": "customer",
+      "mobileNumber": "09914327202",
+      "address": "Minglanilla, Cebu, Central Visayas, 6046, Philippines",
+      "addressBook": [],
+      "profileImage": "",
+      "lastOrderAddress": "Minglanilla, Cebu, Central Visayas, 6046, Philippines",
+      "lastOrderMobileNumber": "09914327202",
+      "createdAt": "2026-05-12T13:55:55.227Z"
     }
   ]
 }

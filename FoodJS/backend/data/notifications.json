@@ -368,6 +368,52 @@
       "email": "villegasjeankathleen@gmail.com",
       "read": true,
       "createdAt": "2026-05-09T01:57:31.050Z"
+    },
+    {
+      "id": "N-1033",
+      "userId": 10,
+      "orderId": "O-1018",
+      "channel": "in-app",
+      "title": "Order status updated",
+      "message": "Order O-1018 status updated to Pending.",
+      "status": "Pending",
+      "read": false,
+      "createdAt": "2026-05-12T14:39:47.528Z"
+    },
+    {
+      "id": "N-1034",
+      "userId": 10,
+      "orderId": "O-1018",
+      "channel": "email",
+      "title": "Order status updated",
+      "message": "Order O-1018 status updated to Pending.",
+      "status": "Pending",
+      "email": "brianjosepharatia@gmail.com",
+      "read": true,
+      "createdAt": "2026-05-12T14:39:47.528Z"
+    },
+    {
+      "id": "N-1035",
+      "userId": 10,
+      "orderId": "O-1018",
+      "channel": "in-app",
+      "title": "Order status updated",
+      "message": "Order O-1018 status updated to Preparing.",
+      "status": "Preparing",
+      "read": false,
+      "createdAt": "2026-05-12T14:40:11.175Z"
+    },
+    {
+      "id": "N-1036",
+      "userId": 10,
+      "orderId": "O-1018",
+      "channel": "email",
+      "title": "Order status updated",
+      "message": "Order O-1018 status updated to Preparing.",
+      "status": "Preparing",
+      "email": "brianjosepharatia@gmail.com",
+      "read": true,
+      "createdAt": "2026-05-12T14:40:11.175Z"
     }
   ]
 }

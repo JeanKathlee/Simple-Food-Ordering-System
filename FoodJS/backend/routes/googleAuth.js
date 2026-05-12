@@ -27,6 +27,10 @@ function buildSafeUser(user = {}) {
     role: user.role,
     mobileNumber: user.mobileNumber || '',
     address: user.address || '',
+    addressBook: Array.isArray(user.addressBook) ? user.addressBook : [],
+    profileImage: user.profileImage || '',
+    lastOrderAddress: user.lastOrderAddress || '',
+    lastOrderMobileNumber: user.lastOrderMobileNumber || '',
   };
 }
 
@@ -75,6 +79,10 @@ router.post('/callback', async (req, res) => {
         role: 'customer',
         mobileNumber: '',
         address: '',
+        addressBook: [],
+        profileImage: '',
+        lastOrderAddress: '',
+        lastOrderMobileNumber: '',
         createdAt: new Date().toISOString(),
       };
       

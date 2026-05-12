@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { NotificationContext } from "../context/NotificationContext";
 
 export function useNotification() {
@@ -8,10 +8,30 @@ export function useNotification() {
     throw new Error("useNotification must be used within NotificationProvider");
   }
 
-  return {
-    success: (message, duration = 3000) => context.showNotification(message, "success", duration),
-    error: (message, duration = 4000) => context.showNotification(message, "error", duration),
-    info: (message, duration = 3000) => context.showNotification(message, "info", duration),
-    warning: (message, duration = 3000) => context.showNotification(message, "warning", duration),
-  };
+  const success = useCallback(
+    (message, duration = 3000) => context.showNotification(message, "success", duration),
+    [context]
+  );
+  const error = useCallback(
+    (message, duration = 4000) => context.showNotification(message, "error", duration),
+    [context]
+  );
+  const info = useCallback(
+    (message, duration = 3000) => context.showNotification(message, "info", duration),
+    [context]
+  );
+  const warning = useCallback(
+    (message, duration = 3000) => context.showNotification(message, "warning", duration),
+    [context]
+  );
+
+  return useMemo(
+    () => ({
+      success,
+      error,
+      info,
+      warning,
+    }),
+    [success, error, info, warning]
+  );
 }

@@ -22,6 +22,7 @@ export default function Menu() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBag, setShowBag] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
 
   // Load sa menu and cart
   useEffect(() => {
@@ -295,12 +296,75 @@ export default function Menu() {
               >
                 My Bag ({cartCount})
               </button>
-              <button type="button" className="client-btn ghost" onClick={() => navigate("/order-history")}>
-                Orders
-              </button>
-              <button type="button" className="client-btn" onClick={handleLogout}>
-                Logout
-              </button>
+              <div
+                className="menu-account"
+                tabIndex={0}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setShowAccountMenu(false);
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setShowAccountMenu(false);
+                  }
+                }}
+              >
+                <button
+                  type="button"
+                  className="client-btn ghost menu-account-trigger"
+                  onClick={() => setShowAccountMenu((prev) => !prev)}
+                  aria-haspopup="menu"
+                  aria-expanded={showAccountMenu}
+                >
+                  <span className="avatar">
+                    {getAuthSession()?.user?.profileImage ? (
+                      <img
+                        src={getAuthSession()?.user?.profileImage}
+                        alt="Account avatar"
+                      />
+                    ) : (
+                      getAuthSession()?.user?.name?.[0] || "U"
+                    )}
+                  </span>
+                  Account ▾
+                </button>
+                {showAccountMenu && (
+                  <div className="menu-account-dropdown" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        navigate("/profile");
+                      }}
+                    >
+                      Profile
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        navigate("/order-history");
+                      }}
+                    >
+                      Order History
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="danger"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        handleLogout();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </header>
 

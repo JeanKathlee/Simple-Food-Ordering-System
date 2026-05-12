@@ -25,6 +25,13 @@ export default function Checkout() {
   const [couponError, setCouponError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderConfirm, setOrderConfirm] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [profileDefaults, setProfileDefaults] = useState({
+    address: "",
+    lastOrderAddress: "",
+    lastOrderMobileNumber: "",
+  });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -62,12 +69,22 @@ export default function Checkout() {
 
         if (profileResponse.ok) {
           const profile = await profileResponse.json();
+          const defaultAddress = profile.address || profile.lastOrderAddress || "";
+          const defaultMobile = profile.mobileNumber || profile.lastOrderMobileNumber || "";
+
+          setProfileDefaults({
+            address: profile.address || "",
+            lastOrderAddress: profile.lastOrderAddress || "",
+            lastOrderMobileNumber: profile.lastOrderMobileNumber || "",
+          });
+          setSavedAddresses(Array.isArray(profile.addressBook) ? profile.addressBook : []);
+          setSelectedAddress(defaultAddress || "");
           setFormData((prev) => ({
             ...prev,
             firstName: profile.firstName || "",
             lastName: profile.lastName || "",
-            mobileNumber: profile.mobileNumber || "",
-            address: profile.address || "",
+            mobileNumber: defaultMobile,
+            address: defaultAddress,
           }));
           return;
         }
@@ -94,11 +111,41 @@ export default function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "address") {
+      setSelectedAddress("");
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
+
+  const addressOptions = useMemo(() => {
+    const options = [];
+    const seen = new Set();
+
+    const pushOption = (label, value) => {
+      const clean = String(value || "").trim();
+      const key = clean.toLowerCase();
+      if (!clean || seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      options.push({ label, value: clean });
+    };
+
+    if (profileDefaults.address) {
+      pushOption(`Default: ${profileDefaults.address}`, profileDefaults.address);
+    }
+
+    if (profileDefaults.lastOrderAddress && profileDefaults.lastOrderAddress !== profileDefaults.address) {
+      pushOption(`Last used: ${profileDefaults.lastOrderAddress}`, profileDefaults.lastOrderAddress);
+    }
+
+    savedAddresses.forEach((entry) => pushOption(`Saved: ${entry}`, entry));
+
+    return options;
+  }, [profileDefaults, savedAddresses]);
 
   const handleApplyCoupon = async () => {
     const normalizedCode = couponCode.trim().toUpperCase();
@@ -310,6 +357,31 @@ export default function Checkout() {
 
               <div className="checkout-delivery-grid">
                 <div className="checkout-delivery-form">
+                  {addressOptions.length > 0 && (
+                    <label className="checkout-single-input">
+                      <span>Saved Addresses</span>
+                      <select
+                        value={selectedAddress}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setSelectedAddress(value);
+                          if (value) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              address: value,
+                            }));
+                          }
+                        }}
+                      >
+                        <option value="">Add a new address</option>
+                        {addressOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                   <p className="checkout-field-label">Delivery Address</p>
                   <textarea
                     className="checkout-address"
@@ -337,10 +409,13 @@ export default function Checkout() {
                   <DeliveryMapPicker
                     value={formData.address}
                     onChange={(address) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        address,
-                      }))
+                      {
+                        setSelectedAddress("");
+                        setFormData((prev) => ({
+                          ...prev,
+                          address,
+                        }));
+                      }
                     }
                   />
                   <p className="checkout-map-caption">Search a place, tap the map, or drag the pin to auto-fill the address.</p>

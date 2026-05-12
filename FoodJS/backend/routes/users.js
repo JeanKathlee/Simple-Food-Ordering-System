@@ -31,6 +31,10 @@ function buildSafeUser(user = {}) {
     role: user.role,
     mobileNumber: user.mobileNumber || '',
     address: user.address || '',
+    addressBook: Array.isArray(user.addressBook) ? user.addressBook : [],
+    profileImage: user.profileImage || '',
+    lastOrderAddress: user.lastOrderAddress || '',
+    lastOrderMobileNumber: user.lastOrderMobileNumber || '',
     createdAt: user.createdAt,
   };
 }
@@ -80,6 +84,10 @@ router.post('/register', async (req, res) => {
     role: 'customer',
     mobileNumber: mobileNumber || '',
     address: address || '',
+    addressBook: [],
+    profileImage: '',
+    lastOrderAddress: '',
+    lastOrderMobileNumber: '',
     createdAt: new Date().toISOString(),
   };
 
@@ -150,6 +158,55 @@ router.get('/me', verifyToken, (req, res) => {
   if (!currentUser) {
     return res.status(404).json({ message: 'User not found.' });
   }
+
+  return res.json(buildSafeUser(currentUser));
+});
+
+router.patch('/me', verifyToken, (req, res) => {
+  const { firstName, lastName, mobileNumber, address, profileImage } = req.body || {};
+  const data = readJsonFromData('users.json');
+  const currentUser = (data.users || []).find((user) => user.id === req.user.sub);
+
+  if (!currentUser) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+
+  if (firstName !== undefined) {
+    const cleanFirstName = String(firstName).trim();
+    if (!cleanFirstName) {
+      return res.status(400).json({ message: 'First name cannot be empty.' });
+    }
+    currentUser.firstName = cleanFirstName;
+  }
+
+  if (lastName !== undefined) {
+    const cleanLastName = String(lastName).trim();
+    if (!cleanLastName) {
+      return res.status(400).json({ message: 'Last name cannot be empty.' });
+    }
+    currentUser.lastName = cleanLastName;
+  }
+
+  if (firstName !== undefined || lastName !== undefined) {
+    const derived = splitLegacyName(currentUser.name);
+    const safeFirstName = currentUser.firstName || derived.firstName;
+    const safeLastName = currentUser.lastName || derived.lastName;
+    currentUser.name = `${safeFirstName} ${safeLastName}`.trim();
+  }
+
+  if (mobileNumber !== undefined) {
+    currentUser.mobileNumber = String(mobileNumber || '').trim();
+  }
+
+  if (address !== undefined) {
+    currentUser.address = String(address || '').trim();
+  }
+
+  if (profileImage !== undefined) {
+    currentUser.profileImage = String(profileImage || '').trim();
+  }
+
+  writeJsonToData('users.json', data);
 
   return res.json(buildSafeUser(currentUser));
 });

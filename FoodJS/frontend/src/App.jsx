@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderHistory from "./pages/OrderHistory";
+import Profile from "./pages/Profile";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationContainer } from "./components/NotificationContainer";
 import { getUserRole, isAuthenticated } from "./lib/auth";
@@ -110,6 +111,14 @@ export default function App() {
           element={
             <CustomerRoute>
               <OrderHistory />
+            </CustomerRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <CustomerRoute>
+              <Profile />
             </CustomerRoute>
           }
         />
