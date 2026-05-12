@@ -16,6 +16,7 @@ const adminInsightsRouter = require('./routes/adminInsights');
 const cartRouter = require('./routes/cart');
 const couponsRouter = require('./routes/coupons');
 const notificationsRouter = require('./routes/notifications');
+const authRouter = require('./routes/auth');
 
 app.use('/api/menu', menuRouter);
 app.use('/api/orders', ordersRouter);
@@ -25,6 +26,7 @@ app.use('/api/admin-insights', adminInsightsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/coupons', couponsRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/auth', authRouter);
 
 app.get('/', (_req, res) => {
   res.json({

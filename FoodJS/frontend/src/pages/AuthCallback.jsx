@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { saveAuthSession } from "../lib/auth";
 import { useNotification } from "../hooks/useNotification";
@@ -7,8 +7,12 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const { error: errorNotif } = useNotification();
   const [params] = useSearchParams();
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const handleCallback = async () => {
       const code = params.get("code");
 
@@ -41,7 +45,7 @@ export default function AuthCallback() {
     };
 
     handleCallback();
-  }, [params, navigate]);
+  }, [params, navigate, errorNotif]);
 
   return <p>Authenticating with Google...</p>;
 }
