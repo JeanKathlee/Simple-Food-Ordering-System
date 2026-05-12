@@ -5,6 +5,19 @@ import { motion } from "framer-motion";
 import { getAuthSession, isAuthenticated, saveAuthSession } from "../lib/auth";
 import logo from "../../assets/logo.png";
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
 function getRoleRoute(role) {
   return role === "admin" ? "/dashboard" : "/menu";
 }
@@ -15,6 +28,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -68,6 +82,7 @@ export default function Login() {
         onSubmit={handleLogin}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="auth-brand">
           <img className="auth-logo" src={logo} alt="FoodJS logo" />
@@ -75,53 +90,100 @@ export default function Login() {
 
         <h2 className="auth-title">LOGIN</h2>
 
-        <div className="input-group">
+        <motion.div 
+          className="input-group" 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+        >
           <input
             className="input"
             type="email"
-            placeholder="Username"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <span className="icon">👤</span>
-        </div>
+          <span className="icon">📧</span>
+        </motion.div>
 
-        <div className="input-group">
+        <motion.div 
+          className="input-group" 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
           <input
             className="input"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <span className="icon">🔒</span>
-        </div>
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? "👁️" : "👁️‍🗨️"}
+          </button>
+        </motion.div>
 
-        {error && <p className="form-error">{error}</p>}
+        {error && (
+          <motion.p 
+            className="form-error"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {error}
+          </motion.p>
+        )}
 
-        <div className="forgot">Forgot Password?</div>
+        <motion.div 
+          className="forgot-container"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <a href="#forgot" className="forgot">Forgot Password?</a>
+        </motion.div>
 
-        <button className="btn-primary" type="submit" disabled={loading}>
+        <motion.button 
+          className="btn-primary" 
+          type="submit" 
+          disabled={loading}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+        >
           {loading ? "Logging in..." : "Login"}
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           className="btn-secondary"
           type="button"
           onClick={handleGoogleLogin}
-          style={{ backgroundColor: "#4285F4" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
         >
           Login with Google
-        </button>
+        </motion.button>
 
-        <p className="text">
-          Don’t have an account?{" "}
+        <motion.p 
+          className="text"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+        >
+          Don't have an account?{" "}
           <Link to="/register" className="link">
             Sign Up
           </Link>
-        </p>
+        </motion.p>
       </motion.form>
     </div>
   );

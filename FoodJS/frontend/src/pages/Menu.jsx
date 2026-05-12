@@ -9,15 +9,20 @@ import {
   enrichMenuWithImages,
   formatPrice,
 } from "../data/menuItems";
+import { useNotification } from "../hooks/useNotification";
 
 export default function Menu() {
   const navigate = useNavigate();
+  const { success, error: errorNotif } = useNotification();
   const [menuItems, setMenuItems] = useState([]);
   const [tabs, setTabs] = useState(["All"]);
   const [activeTab, setActiveTab] = useState("All");
   const [query, setQuery] = useState("");
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showBag, setShowBag] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
 
   // Load sa menu and cart
   useEffect(() => {
@@ -72,8 +77,19 @@ export default function Menu() {
   }, [activeTab, query, menuItems]);
 
   const handleLogout = () => {
+    setLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     clearAuthSession();
+    setLogoutConfirm(false);
     navigate("/");
+  };
+
+  const openProductDetails = (item) => {
+    navigate(`/product/${encodeURIComponent(item.name)}`, {
+      state: { item },
+    });
   };
 
   const addToCart = async (item) => {
@@ -82,7 +98,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to add items to cart");
+        errorNotif("Please log in to add items to cart");
         return;
       }
 
@@ -103,12 +119,13 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to add to cart:", response.status, error);
-        alert(error?.message || "Failed to add item to cart");
+        errorNotif(error?.message || "Failed to add item to cart");
         return;
       }
 
       // Add or update in local state
       setCartItems((prev) => {
+        success(`${item.name} added to cart!`);
         const existing = prev.find((cart) => cart.menuItemId === item.id);
         if (existing) {
           return prev.map((cart) =>
@@ -131,7 +148,7 @@ export default function Menu() {
       });
     } catch (err) {
       console.error("Failed to add to cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -146,7 +163,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to update cart");
+        errorNotif("Please log in to update cart");
         return;
       }
 
@@ -162,7 +179,7 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to update cart:", response.status, error);
-        alert(error?.message || "Failed to update cart item");
+        errorNotif(error?.message || "Failed to update cart item");
         return;
       }
 
@@ -173,9 +190,10 @@ export default function Menu() {
             : item
         )
       );
+      success("Cart updated successfully!");
     } catch (err) {
       console.error("Failed to update cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -185,7 +203,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to remove items from cart");
+        errorNotif("Please log in to remove items from cart");
         return;
       }
 
@@ -199,16 +217,17 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to remove from cart:", response.status, error);
-        alert(error?.message || "Failed to remove from cart");
+        errorNotif(error?.message || "Failed to remove from cart");
         return;
       }
 
       setCartItems((prev) =>
         prev.filter((item) => item.menuItemId !== menuItemId)
       );
+      success("Item removed from cart");
     } catch (err) {
       console.error("Failed to remove from cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -218,7 +237,7 @@ export default function Menu() {
       const token = session?.token;
       
       if (!token) {
-        alert("Please log in to clear cart");
+        errorNotif("Please log in to clear cart");
         return;
       }
 
@@ -232,14 +251,15 @@ export default function Menu() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to clear cart:", response.status, error);
-        alert(error?.message || "Failed to clear cart");
+        errorNotif(error?.message || "Failed to clear cart");
         return;
       }
 
       setCartItems([]);
+      success("Cart cleared successfully!");
     } catch (err) {
       console.error("Failed to clear cart:", err);
-      alert("Network error: " + err.message);
+      errorNotif("Network error: " + err.message);
     }
   };
 
@@ -256,157 +276,254 @@ export default function Menu() {
   const hasCartItems = cartItems.length > 0;
 
   return (
-    <div className="customer-home-page">
-      <section className="customer-home-hero">
-        <div className="customer-home-toprow">
-          <div className="customer-home-brand">
-            <img src={logo} alt="FoodJS" />
-            <div>
-              <h1>FoodJS</h1>
-              <p>Choose your favorites and order fast.</p>
+    <div className="client-page menu-page">
+      <div className="client-shell">
+        <div className="menu-topbar-wrap">
+          <header className="page-topbar menu-topbar">
+            <div className="menu-brand">
+              <img src={logo} alt="FoodJS" />
+              <div>
+                <h1>FoodJS Menu</h1>
+                <p>Choose your favorites and order fast.</p>
+              </div>
             </div>
-          </div>
 
-          <div className="customer-home-actions">
-            <span className="customer-home-user">Hi, {getAuthSession()?.user?.name || "Customer"}</span>
-            <button type="button" className="customer-home-logout" onClick={() => navigate("/cart")}>
-              My Cart ({cartCount})
-            </button>
-            <button type="button" className="customer-home-logout" onClick={() => navigate("/order-history")}>
-              My Orders
-            </button>
-            <button type="button" className="customer-home-logout" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </div>
-
-        <div className="customer-search-wrap">
-          <input
-            className="customer-search"
-            type="search"
-            placeholder="Search menu"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <span className="customer-search-icon">⌕</span>
-        </div>
-
-        <div className="customer-chip-row">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              className={`customer-chip ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className={`customer-layout ${hasCartItems ? "with-bag" : ""}`}>
-        <div className="customer-main">
-          <div className="customer-grid-wrap">
-            <div className="customer-grid">
-              {visibleItems.map((item) => (
-                <article
-                  key={item.name}
-                  className="customer-card"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() =>
-                    navigate(`/product/${encodeURIComponent(item.name)}`, {
-                      state: { item },
-                    })
+            <div className="page-actions">
+              <button
+                type="button"
+                className="client-btn ghost"
+                onClick={() => setShowBag((prev) => !prev)}
+              >
+                My Bag ({cartCount})
+              </button>
+              <div
+                className="menu-account"
+                tabIndex={0}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setShowAccountMenu(false);
                   }
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      navigate(`/product/${encodeURIComponent(item.name)}`, {
-                        state: { item },
-                      });
-                    }
-                  }}
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setShowAccountMenu(false);
+                  }
+                }}
+              >
+                <button
+                  type="button"
+                  className="client-btn ghost menu-account-trigger"
+                  onClick={() => setShowAccountMenu((prev) => !prev)}
+                  aria-haspopup="menu"
+                  aria-expanded={showAccountMenu}
                 >
-                  <img src={item.image} alt={item.name} className="customer-card-image" />
-                  <h3>{item.name}</h3>
-                  <p>{item.description}</p>
-                  <strong>{formatPrice(item.price)}</strong>
+                  <span className="avatar">
+                    {getAuthSession()?.user?.profileImage ? (
+                      <img
+                        src={getAuthSession()?.user?.profileImage}
+                        alt="Account avatar"
+                      />
+                    ) : (
+                      getAuthSession()?.user?.name?.[0] || "U"
+                    )}
+                  </span>
+                  Account ▾
+                </button>
+                {showAccountMenu && (
+                  <div className="menu-account-dropdown" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        navigate("/profile");
+                      }}
+                    >
+                      Profile
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        navigate("/order-history");
+                      }}
+                    >
+                      Order History
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="danger"
+                      onClick={() => {
+                        setShowAccountMenu(false);
+                        handleLogout();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {showBag && (
+            <div className="menu-bag-dropdown">
+              <div className="menu-bag-header">
+                <div>
+                  <h2>My Bag</h2>
+                  <p>{cartCount} item{cartCount === 1 ? "" : "s"}</p>
+                </div>
+                <div className="menu-bag-header-actions">
                   <button
                     type="button"
-                    className="customer-add-btn"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      navigate(`/product/${encodeURIComponent(item.name)}`, {
-                        state: { item },
-                      });
-                    }}
-                    aria-label={`Add ${item.name}`}
+                    className="client-btn ghost"
+                    onClick={clearCart}
+                    disabled={!cartItems.length}
                   >
-                    +
-                  </button>
-                </article>
-              ))}
-            </div>
-
-            {!visibleItems.length && (
-              <div className="customer-empty-state">
-                <h2>No matches found.</h2>
-                <p>Try a different keyword or category.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {hasCartItems && <aside className="my-bag-panel">
-          <div className="my-bag-header-row">
-            <h2>My Bag</h2>
-            <div className="my-bag-meta">
-              <span>{cartCount} item{cartCount === 1 ? "" : "s"}</span>
-              <button type="button" onClick={clearCart} disabled={!cartItems.length}>
-                Delete All
-              </button>
-            </div>
-          </div>
-
-          <div className="my-bag-list">
-            {cartItems.map((item) => (
-              <article key={item.menuItemId} className="my-bag-item">
-                <h3>{item.name}</h3>
-                <p>{formatPrice(item.price * item.quantity)}</p>
-                <div className="my-bag-item-actions">
-                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
-                    +
-                  </button>
-                  <button type="button" className="remove" onClick={() => removeFromCart(item.menuItemId)}>
-                    Remove
+                    Clear
                   </button>
                 </div>
-              </article>
-            ))}
+              </div>
+
+              {cartItems.length === 0 ? (
+                <div className="menu-bag-empty">
+                  <p>Your bag is empty.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="menu-bag-list">
+                    {cartItems.map((item) => (
+                      <div key={item.menuItemId} className="menu-bag-item">
+                        <div>
+                          <h3>{item.name}</h3>
+                          <p>{formatPrice(item.price * item.quantity)}</p>
+                        </div>
+                        <div className="menu-bag-actions">
+                          <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity - 1)}>
+                            −
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button type="button" onClick={() => adjustQuantity(item.menuItemId, item.quantity + 1)}>
+                            +
+                          </button>
+                          <button type="button" className="remove" onClick={() => removeFromCart(item.menuItemId)}>
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="menu-bag-total">
+                    <div>
+                      <span>Subtotal</span>
+                      <strong>{formatPrice(subtotal)}</strong>
+                    </div>
+                    <button type="button" className="client-btn primary" onClick={() => navigate("/cart")}>
+                      Check Cart
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        <section className="panel-card menu-toolbar">
+          <div className="menu-toolbar-header">
+            <p className="menu-greeting">Hi, {getAuthSession()?.user?.name || "Customer"}</p>
+          </div>
+          <div className="menu-search-row">
+            <input
+              className="menu-search-input"
+              type="search"
+              placeholder="Search menu items"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+            <span className="menu-search-icon">⌕</span>
           </div>
 
-          <div className="my-bag-total">
-            <div>
-              <span>Subtotal</span>
-              <strong>{formatPrice(subtotal)}</strong>
-            </div>
-            <div>
-              <span>Total</span>
-              <strong>{formatPrice(subtotal)}</strong>
-            </div>
-            <button type="button" disabled={!cartItems.length} onClick={() => navigate("/cart")}>
-              Proceed to Checkout
-            </button>
+          <div className="menu-tab-row">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                className={`menu-tab ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
-        </aside>}
-      </section>
+        </section>
+
+        {loading ? (
+          <div className="page-loading">Loading menu...</div>
+        ) : (
+          <section className="menu-layout">
+            <div className="menu-grid">
+              {visibleItems.map((item) => (
+                <article key={item.name} className="menu-card">
+                  <button
+                    type="button"
+                    className="menu-card-image-button"
+                    onClick={() => openProductDetails(item)}
+                    aria-label={`View ${item.name} details`}
+                  >
+                    <img src={item.image} alt={item.name} className="menu-card-image" />
+                  </button>
+                  <div className="menu-card-body">
+                    <h3>{item.name}</h3>
+                    <p>{item.description || "Freshly prepared and served hot."}</p>
+                  </div>
+                  <div className="menu-card-footer">
+                    <strong>{formatPrice(item.price)}</strong>
+                    <div className="menu-card-actions">
+                      <button type="button" className="client-btn primary" onClick={() => openProductDetails(item)}>
+                        Add to cart
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+
+              {!visibleItems.length && (
+                <div className="panel-card empty-state">
+                  <h2>No matches found</h2>
+                  <p>Try a different keyword or category.</p>
+                </div>
+              )}
+            </div>
+
+          </section>
+        )}
+
+        {logoutConfirm && (
+          <div className="cart-popup-backdrop" role="presentation" onClick={() => setLogoutConfirm(false)}>
+            <section
+              className="panel-card cart-popup"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirm logout"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div>
+                <h2>Confirm Logout</h2>
+                <p>Are you sure you want to logout?</p>
+              </div>
+              <div className="cart-popup-actions">
+                <button type="button" className="client-btn ghost" onClick={() => setLogoutConfirm(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="client-btn" onClick={confirmLogout}>Logout</button>
+              </div>
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

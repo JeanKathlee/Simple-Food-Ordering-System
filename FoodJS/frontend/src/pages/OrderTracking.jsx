@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatPrice } from "../data/menuItems";
 import { getAuthSession } from "../lib/auth";
+import { useNotification } from "../hooks/useNotification";
 
 export default function OrderTracking() {
   const navigate = useNavigate();
+  const { success, error: errorNotif } = useNotification();
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [orderNotifications, setOrderNotifications] = useState([]);
+  const [noticesLoading, setNoticesLoading] = useState(true);
 
   const loadOrder = async () => {
     try {
@@ -36,11 +40,42 @@ export default function OrderTracking() {
     }
   };
 
+  const loadNotifications = async () => {
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+
+      if (!token) {
+        return;
+      }
+
+      const response = await fetch("/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const notifications = Array.isArray(data)
+          ? data.filter((notice) => notice.orderId === orderId)
+          : [];
+        setOrderNotifications(notifications);
+      }
+    } catch (err) {
+      console.error("Failed to load notifications:", err);
+    } finally {
+      setNoticesLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadOrder();
+    loadNotifications();
     
     // matic update every5 seconds
-    const interval = setInterval(loadOrder, 5000);
+    const interval = setInterval(() => {
+      loadOrder();
+      loadNotifications();
+    }, 5000);
     
     return () => clearInterval(interval);
   }, [orderId, navigate]);
@@ -62,173 +97,183 @@ export default function OrderTracking() {
       if (response.ok) {
         const updated = await response.json();
         setOrder(updated);
-        alert("Order cancelled successfully");
+        success("Order cancelled successfully!");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to cancel order");
+        errorNotif(error.message || "Failed to cancel order");
       }
     } catch (err) {
       console.error("Error cancelling order:", err);
-      alert("Error: " + err.message);
+      errorNotif("Error: " + err.message);
     }
   };
 
   const canCancel = order && (order.status === "Pending" || order.status === "Preparing");
   const statusSteps = ["Pending", "Preparing", "Ready", "Delivered"];
-  const currentStatusIndex = statusSteps.indexOf(order?.status || "Pending");
+  const currentStatusIndex = Math.max(
+    0,
+    statusSteps.indexOf(order?.status || "Pending")
+  );
+  const unreadNotifications = orderNotifications.filter((notice) => !notice.read);
+
+  const markOrderNotificationsRead = async () => {
+    if (unreadNotifications.length === 0) {
+      return;
+    }
+
+    try {
+      const session = getAuthSession();
+      const token = session?.token;
+
+      await Promise.all(
+        unreadNotifications.map((notice) =>
+          fetch(`/api/notifications/${notice.id}/read`, {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        )
+      );
+
+      setOrderNotifications((prev) =>
+        prev.map((notice) =>
+          unreadNotifications.some((unread) => unread.id === notice.id)
+            ? { ...notice, read: true }
+            : notice
+        )
+      );
+    } catch (err) {
+      console.error("Failed to mark notifications as read:", err);
+    }
+  };
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return <div className="page-loading">Loading...</div>;
   }
 
   if (!order) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Order not found</div>;
+    return <div className="page-loading">Order not found</div>;
   }
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "30px" }}>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          ← Back
-        </button>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Home
-        </button>
-      </div>
-      <h1>Order Tracking</h1>
-      <p><strong>Order ID:</strong> {order.id}</p>
-
-      <div style={{ marginBottom: "30px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-          {statusSteps.map((step, index) => (
-            <div key={step} style={{ textAlign: "center", flex: 1 }}>
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  margin: "0 auto 8px",
-                  backgroundColor: index <= currentStatusIndex ? "#4caf50" : "#ddd",
-                  color: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                }}
-              >
-                {index <= currentStatusIndex ? "✓" : index + 1}
-              </div>
-              <p style={{ fontSize: "12px", margin: "0", fontWeight: index === currentStatusIndex ? "bold" : "normal" }}>
-                {step}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div
-          style={{
-            height: "3px",
-            backgroundColor: "#ddd",
-            position: "relative",
-            marginTop: "-25px",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              backgroundColor: "#4caf50",
-              width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%`,
-              transition: "width 0.3s ease",
-            }}
-          />
-        </div>
-      </div>
-
-      <div style={{ backgroundColor: "#e3f2fd", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h3 style={{ margin: "0 0 5px 0" }}>Current Status</h3>
-        <p style={{ margin: "0", fontSize: "18px", color: "#1976d2" }}>{order.status}</p>
-      </div>
-
-      <div style={{ backgroundColor: "#f5f5f5", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h3>Order Details</h3>
-        <p><strong>Customer:</strong> {order.customerName}</p>
-        <p><strong>Payment:</strong> {order.paymentMethod}</p>
-        <p><strong>Placed:</strong> {new Date(order.createdAt).toLocaleString()}</p>
-      </div>
-
-      <div style={{ marginBottom: "20px" }}>
-        <h3>Items</h3>
-        {order.items.map((item) => (
-          <div key={item.menuItemId} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ddd" }}>
-            <div>
-              <strong>{item.name}</strong>
-              <p style={{ fontSize: "12px", color: "#666", margin: "3px 0" }}>Qty: {item.quantity}</p>
-            </div>
-            <div>{formatPrice(item.price * item.quantity)}</div>
+    <div className="client-page tracking-page">
+      <div className="client-shell">
+        <header className="page-topbar">
+          <div>
+            <h1>Order Tracking</h1>
+            <p>Order ID: {order.id}</p>
           </div>
-        ))}
-      </div>
+          <div className="page-actions">
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>← Back</button>
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>Home</button>
+          </div>
+        </header>
 
-      <div style={{ backgroundColor: "#fff9c4", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "18px", fontWeight: "bold" }}>
-          <span>Total:</span>
-          <span>{formatPrice(order.total)}</span>
+        <div className="tracking-layout">
+          <section className="panel-card">
+            <div className="status-track">
+              {statusSteps.map((step, index) => (
+                <div key={step} className={`status-step ${index <= currentStatusIndex ? "active" : ""}`}>
+                  <div className="status-dot">
+                    {index <= currentStatusIndex ? "✓" : index + 1}
+                  </div>
+                  <span>{step}</span>
+                </div>
+              ))}
+              <div className="status-bar">
+                <div
+                  className="status-bar-fill"
+                  style={{ width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="tracking-status-card">
+              <div>
+                <p>Current Status</p>
+                <h2>{order.status}</h2>
+              </div>
+              <span className={`status-pill ${order.status.toLowerCase()}`}>{order.status}</span>
+            </div>
+
+            <div className="tracking-details">
+              <div>
+                <span>Customer</span>
+                <strong>{order.customerName}</strong>
+              </div>
+              <div>
+                <span>Payment</span>
+                <strong>{order.paymentMethod}</strong>
+              </div>
+              <div>
+                <span>Placed</span>
+                <strong>{new Date(order.createdAt).toLocaleString()}</strong>
+              </div>
+            </div>
+
+            <div className="order-items">
+              <h3>Items</h3>
+              {order.items.map((item) => (
+                <div key={item.menuItemId} className="order-item-row">
+                  <div>
+                    <strong>{item.name}</strong>
+                    <p>Qty: {item.quantity}</p>
+                  </div>
+                  <span>{formatPrice(item.price * item.quantity)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="order-total-row">
+              <span>Total</span>
+              <strong>{formatPrice(order.total)}</strong>
+            </div>
+
+            {canCancel && (
+              <button className="client-btn danger" onClick={handleCancelOrder}>
+                Cancel Order
+              </button>
+            )}
+          </section>
+
+          <aside className="panel-card tracking-sidebar">
+            <div className="tracking-sidebar-header">
+              <h3>Status Notifications</h3>
+              <button
+                type="button"
+                className="client-btn ghost"
+                onClick={markOrderNotificationsRead}
+                disabled={unreadNotifications.length === 0}
+              >
+                Mark all read
+              </button>
+            </div>
+
+            {noticesLoading ? (
+              <p className="muted-text">Loading notifications...</p>
+            ) : orderNotifications.length === 0 ? (
+              <p className="muted-text">No status updates yet.</p>
+            ) : (
+              <div className="notification-list">
+                {orderNotifications.map((notice) => (
+                  <div key={notice.id} className={`notification-item ${notice.read ? "" : "unread"}`}>
+                    <div>
+                      <strong>{notice.title}</strong>
+                      <p>{notice.message}</p>
+                    </div>
+                    <span>{new Date(notice.createdAt).toLocaleTimeString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="tracking-actions">
+              <button className="client-btn ghost" onClick={() => navigate("/order-history")}>
+                View All Orders
+              </button>
+            </div>
+          </aside>
         </div>
       </div>
-
-      {canCancel && (
-        <button
-          onClick={handleCancelOrder}
-          style={{
-            width: "100%",
-            padding: "12px",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "16px",
-            cursor: "pointer",
-            marginBottom: "10px",
-          }}
-        >
-          Cancel Order
-        </button>
-      )}
-
-      <button
-        onClick={() => navigate("/order-history")}
-        style={{
-          width: "100%",
-          padding: "12px",
-          backgroundColor: "#757575",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          fontSize: "16px",
-          cursor: "pointer",
-        }}
-      >
-        View All Orders
-      </button>
     </div>
   );
 }

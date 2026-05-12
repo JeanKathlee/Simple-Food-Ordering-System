@@ -12,6 +12,8 @@ export default function OrderHistory() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [noticesLoading, setNoticesLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -59,6 +61,34 @@ export default function OrderHistory() {
     };
   }, [navigate]);
 
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const session = getAuthSession();
+        const token = session?.token;
+
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch("/api/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setNotifications(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Failed to load notifications:", err);
+      } finally {
+        setNoticesLoading(false);
+      }
+    };
+
+    loadNotifications();
+  }, []);
+
   const filteredOrders = orders.filter((order) => {
     // by order ID
     if (searchId && !order.id.includes(searchId)) {
@@ -91,191 +121,131 @@ export default function OrderHistory() {
   });
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return <div className="page-loading">Loading...</div>;
   }
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "30px" }}>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          ← Back
-        </button>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Home
-        </button>
-      </div>
-      <h1>Order History</h1>
-
-      <div style={{ backgroundColor: "#f9f9f9", padding: "20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h3>Search & Filter</h3>
-        
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "15px" }}>
+    <div className="client-page history-page">
+      <div className="client-shell">
+        <header className="page-topbar">
           <div>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Order ID</label>
-            <input
-              type="text"
-              placeholder="Search by order ID (e.g., O-1001)"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
+            <h1>Order History</h1>
+            <p>Track past orders, filter by date or status.</p>
           </div>
-          <div>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Customer Name</label>
-            <input
-              type="text"
-              placeholder="Search by customer name"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
+          <div className="page-actions">
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>← Back</button>
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>Home</button>
           </div>
-        </div>
+        </header>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "15px" }}>
-          <div>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            >
-              <option>All</option>
-              <option>Pending</option>
-              <option>Preparing</option>
-              <option>Ready</option>
-              <option>Delivered</option>
-              <option>Cancelled</option>
-            </select>
-          </div>
-          <div>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>From Date</label>
-            <input
-              type="date"
-              value={filterDateFrom}
-              onChange={(e) => setFilterDateFrom(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
-          </div>
-          <div>
-            <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>To Date</label>
-            <input
-              type="date"
-              value={filterDateTo}
-              onChange={(e) => setFilterDateTo(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
-          </div>
-        </div>
-
-        <p style={{ margin: "15px 0 0 0", fontSize: "12px", color: "#666" }}>
-          Showing {filteredOrders.length} of {orders.length} orders
-        </p>
-      </div>
-
-      {filteredOrders.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "50px", backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
-          <p style={{ fontSize: "18px", color: "#666" }}>
-            {orders.length === 0 ? "No orders yet" : "No orders match your filters"}
-          </p>
-          {orders.length === 0 && (
-            <button
-              onClick={() => navigate("/menu")}
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#1976d2",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Start Ordering
-            </button>
-          )}
-        </div>
-      ) : (
-        <div>
-          {filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              style={{
-                backgroundColor: "#f9f9f9",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "15px",
-                marginBottom: "15px",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(`/order-tracking/${order.id}`)}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <div>
-                  <p style={{ margin: "0", fontWeight: "bold", fontSize: "16px" }}>Order {order.id}</p>
-                  <p style={{ margin: "5px 0 0 0", color: "#666", fontSize: "12px" }}>
-                    {new Date(order.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ margin: "0", fontWeight: "bold", fontSize: "16px" }}>
-                    {formatPrice(order.total)}
-                  </p>
-                  <p
-                    style={{
-                      margin: "5px 0 0 0",
-                      padding: "4px 8px",
-                      backgroundColor:
-                        order.status === "Delivered"
-                          ? "#c8e6c9"
-                          : order.status === "Ready"
-                          ? "#fff9c4"
-                          : "#e0e0e0",
-                      color:
-                        order.status === "Delivered"
-                          ? "#2e7d32"
-                          : order.status === "Ready"
-                          ? "#f57f17"
-                          : "#424242",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {order.status}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ fontSize: "12px", color: "#666" }}>
-                <p style={{ margin: "5px 0" }}>
-                  {order.items.length} item{order.items.length !== 1 ? "s" : ""} • {order.paymentMethod}
-                </p>
-              </div>
+        <div className="history-layout">
+          <section className="panel-card filter-card">
+            <div className="filter-header">
+              <h3>Search & Filter</h3>
+              <span>{filteredOrders.length} / {orders.length} orders</span>
             </div>
-          ))}
+
+            <div className="filter-grid">
+              <label>
+                <span>Order ID</span>
+                <input
+                  type="text"
+                  placeholder="Search by order ID"
+                  value={searchId}
+                  onChange={(e) => setSearchId(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Customer Name</span>
+                <input
+                  type="text"
+                  placeholder="Search by customer name"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Status</span>
+                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                  <option>All</option>
+                  <option>Pending</option>
+                  <option>Preparing</option>
+                  <option>Ready</option>
+                  <option>Delivered</option>
+                  <option>Cancelled</option>
+                </select>
+              </label>
+              <label>
+                <span>From Date</span>
+                <input
+                  type="date"
+                  value={filterDateFrom}
+                  onChange={(e) => setFilterDateFrom(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>To Date</span>
+                <input
+                  type="date"
+                  value={filterDateTo}
+                  onChange={(e) => setFilterDateTo(e.target.value)}
+                />
+              </label>
+            </div>
+          </section>
+
+          <aside className="panel-card history-notifications">
+            <h3>Status Notifications</h3>
+            {noticesLoading ? (
+              <p className="muted-text">Loading notifications...</p>
+            ) : notifications.length === 0 ? (
+              <p className="muted-text">No status updates yet.</p>
+            ) : (
+              <div className="notification-list">
+                {notifications.slice(0, 5).map((notice) => (
+                  <div key={notice.id} className={`notification-item ${notice.read ? "" : "unread"}`}>
+                    <div>
+                      <strong>{notice.title}</strong>
+                      <p>{notice.message}</p>
+                    </div>
+                    <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </aside>
         </div>
-      )}
+
+        {filteredOrders.length === 0 ? (
+          <section className="panel-card empty-state">
+            <h2>{orders.length === 0 ? "No orders yet" : "No orders match your filters"}</h2>
+            <p>Try adjusting the filters or start a new order.</p>
+            {orders.length === 0 && (
+              <button className="client-btn primary" onClick={() => navigate("/menu")}>Start Ordering</button>
+            )}
+          </section>
+        ) : (
+          <section className="history-list">
+            {filteredOrders.map((order) => (
+              <article
+                key={order.id}
+                className="panel-card history-card"
+                onClick={() => navigate(`/order-tracking/${order.id}`)}
+              >
+                <div>
+                  <h3>Order {order.id}</h3>
+                  <p>{new Date(order.createdAt).toLocaleString()}</p>
+                </div>
+                <div className="history-meta">
+                  <strong>{formatPrice(order.total)}</strong>
+                  <span className={`status-pill ${order.status.toLowerCase()}`}>{order.status}</span>
+                  <p>{order.items.length} items • {order.paymentMethod}</p>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

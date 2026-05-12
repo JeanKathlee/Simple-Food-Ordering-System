@@ -8,7 +8,7 @@
       "minOrderAmount": 100,
       "expiryDate": "2026-12-31",
       "maxUses": -1,
-      "usedCount": 1,
+      "usedCount": 2,
       "description": "10% off"
     },
     {
@@ -19,7 +19,7 @@
       "minOrderAmount": 200,
       "expiryDate": "2026-12-31",
       "maxUses": -1,
-      "usedCount": 0,
+      "usedCount": 1,
       "description": "Flat 50 off on orders above 200"
     },
     {

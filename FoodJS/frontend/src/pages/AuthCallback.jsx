@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { saveAuthSession } from "../lib/auth";
+import { useNotification } from "../hooks/useNotification";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
+  const { error: errorNotif } = useNotification();
   const [params] = useSearchParams();
 
   useEffect(() => {
@@ -11,7 +13,7 @@ export default function AuthCallback() {
       const code = params.get("code");
 
       if (!code) {
-        alert("No authorization code received");
+        errorNotif("No authorization code received");
         navigate("/login");
         return;
       }
@@ -29,11 +31,11 @@ export default function AuthCallback() {
           saveAuthSession({ token: data.token, user: data.user });
           navigate("/menu");
         } else {
-          alert(data.message || "Login failed");
+          errorNotif(data.message || "Login failed");
           navigate("/login");
         }
       } catch (err) {
-        alert("Error: " + err.message);
+        errorNotif("Error: " + err.message);
         navigate("/login");
       }
     };

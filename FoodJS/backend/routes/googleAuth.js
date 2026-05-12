@@ -7,6 +7,33 @@ const { writeJsonToData } = require('../lib/writeJson');
 
 const router = express.Router();
 
+function splitName(name = '') {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || 'Google',
+    lastName: parts.slice(1).join(' ') || 'User',
+  };
+}
+
+function buildSafeUser(user = {}) {
+  const firstName = user.firstName || '';
+  const lastName = user.lastName || '';
+  return {
+    id: user.id,
+    firstName,
+    lastName,
+    name: `${firstName} ${lastName}`.trim() || user.name || '',
+    email: user.email,
+    role: user.role,
+    mobileNumber: user.mobileNumber || '',
+    address: user.address || '',
+    addressBook: Array.isArray(user.addressBook) ? user.addressBook : [],
+    profileImage: user.profileImage || '',
+    lastOrderAddress: user.lastOrderAddress || '',
+    lastOrderMobileNumber: user.lastOrderMobileNumber || '',
+  };
+}
+
 router.post('/callback', async (req, res) => {
   const { code } = req.body;
 
@@ -52,6 +79,7 @@ router.post('/callback', async (req, res) => {
     }
 
     const { email, name } = userRes.data;
+    const { firstName, lastName } = splitName(name);
     console.log('Got user info from Google:', email);
 
     if (!email) {
@@ -77,10 +105,18 @@ router.post('/callback', async (req, res) => {
       
       user = {
         id: newId,
-        name: name || 'Google User',
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(),
         email,
         passwordHash,
         role: 'customer',
+        mobileNumber: '',
+        address: '',
+        addressBook: [],
+        profileImage: '',
+        lastOrderAddress: '',
+        lastOrderMobileNumber: '',
         createdAt: new Date().toISOString(),
       };
       
@@ -98,13 +134,13 @@ router.post('/callback', async (req, res) => {
 
     // Create JWT
     const token = jwt.sign(
-      { sub: user.id, email: user.email },
+      { sub: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
 
     console.log('JWT token created successfully');
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token, user: buildSafeUser(user) });
   } catch (err) {
     console.error('Unexpected Google auth error:', err.message);
     console.error('Full error stack:', err.stack);

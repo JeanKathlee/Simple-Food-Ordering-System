@@ -42,96 +42,104 @@ export default function OrderConfirmation() {
   }, [orderId, navigate]);
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return <div className="page-loading">Loading...</div>;
   }
 
   if (!order) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Order not found</div>;
+    return <div className="page-loading">Order not found</div>;
   }
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "30px" }}>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Home
-        </button>
-      </div>
-      <div style={{ backgroundColor: "#e8f5e9", padding: "20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h1 style={{ color: "#2e7d32", margin: "0" }}>✓ Order Confirmed!</h1>
-        <p style={{ color: "#558b2f", margin: "5px 0" }}>Thank you for your order</p>
-      </div>
-
-      <div style={{ backgroundColor: "#f5f5f5", padding: "20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h3>Order Details</h3>
-        <p><strong>Order ID:</strong> {order.id}</p>
-        <p><strong>Customer:</strong> {order.customerName}</p>
-        <p><strong>Status:</strong> <span style={{ color: "#ff9800", fontWeight: "bold" }}>{order.status}</span></p>
-        <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
-      </div>
-
-      <div style={{ marginBottom: "20px" }}>
-        <h3>Items</h3>
-        {order.items.map((item) => (
-          <div key={item.menuItemId} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ddd" }}>
-            <div>
-              <strong>{item.name}</strong>
-              <p style={{ fontSize: "12px", color: "#666", margin: "3px 0" }}>Qty: {item.quantity}</p>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              {formatPrice(item.price * item.quantity)}
-            </div>
+    <div className="client-page order-page">
+      <div className="client-shell">
+        <header className="page-topbar">
+          <div>
+            <h1>Order Success</h1>
+            <p>Thank you for ordering with FoodJS.</p>
           </div>
-        ))}
-      </div>
+          <div className="page-actions">
+            <button className="client-btn ghost" onClick={() => navigate("/menu")}>Menu</button>
+            <button
+              className="client-btn ghost"
+              onClick={() => {
+                const session = getAuthSession();
+                navigate(session?.token ? "/menu" : "/");
+              }}
+            >
+              Home
+            </button>
+          </div>
+        </header>
 
-      <div style={{ backgroundColor: "#fff9c4", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "18px", fontWeight: "bold" }}>
-          <span>Total:</span>
-          <span>{formatPrice(order.total)}</span>
+        <section className="panel-card order-hero">
+          <div>
+            <span className="order-hero-label">Order confirmed</span>
+            <h2>Your meal is being prepared</h2>
+            <p>Track this order anytime using the ID below.</p>
+          </div>
+          <div className="order-hero-meta">
+            <div>
+              <span>Order ID</span>
+              <strong>{order.id}</strong>
+            </div>
+            <span className={`status-pill ${order.status.toLowerCase()}`}>{order.status}</span>
+          </div>
+        </section>
+
+        <div className="order-confirm-grid">
+          <section className="panel-card order-details">
+            <div className="order-section-header">
+              <h3>Order Details</h3>
+              <span>Summary</span>
+            </div>
+            <div className="order-detail-grid">
+              <div>
+                <span>Customer: </span>
+                <strong>{order.customerName}</strong>
+              </div>
+              <div>
+                <span>Payment: </span>
+                <strong>{order.paymentMethod}</strong>
+              </div>
+              <div>
+                <span>Placed: </span>
+                <strong>{new Date(order.createdAt).toLocaleString()}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel-card order-items-card">
+            <div className="order-section-header">
+              <h3>Items</h3>
+              <span>{order.items.length} item{order.items.length === 1 ? "" : "s"}</span>
+            </div>
+            <div className="order-items">
+              {order.items.map((item) => (
+                <div key={item.menuItemId} className="order-item-row">
+                  <div>
+                    <strong>{item.name}</strong>
+                    <p>Qty: {item.quantity}</p>
+                  </div>
+                  <span>{formatPrice(item.price * item.quantity)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="order-total-row">
+              <span>Total</span>
+              <strong>{formatPrice(order.total)}</strong>
+            </div>
+          </section>
         </div>
-      </div>
 
-      <div style={{ display: "flex", gap: "10px" }}>
-        <button
-          onClick={() => navigate(`/order-tracking/${order.id}`)}
-          style={{
-            flex: 1,
-            padding: "12px",
-            backgroundColor: "#1976d2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          Track Order
-        </button>
-        <button
-          onClick={() => navigate("/menu")}
-          style={{
-            flex: 1,
-            padding: "12px",
-            backgroundColor: "#757575",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          Continue Shopping
-        </button>
+        <div className="order-actions">
+          <button className="client-btn primary" onClick={() => navigate(`/order-tracking/${order.id}`)}>
+            Track Order
+          </button>
+          <button className="client-btn ghost" onClick={() => navigate("/order-history")}
+          >
+            View Order History
+          </button>
+        </div>
       </div>
     </div>
   );

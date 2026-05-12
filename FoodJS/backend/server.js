@@ -5,7 +5,8 @@ const app = express();
 const PORT = 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const menuRouter = require('./routes/menu');
 const ordersRouter = require('./routes/orders');
@@ -14,7 +15,7 @@ const categoriesRouter = require('./routes/categories');
 const adminInsightsRouter = require('./routes/adminInsights');
 const cartRouter = require('./routes/cart');
 const couponsRouter = require('./routes/coupons');
-const googleAuthRouter = require('./routes/googleAuth');
+const notificationsRouter = require('./routes/notifications');
 
 app.use('/api/menu', menuRouter);
 app.use('/api/orders', ordersRouter);
@@ -23,7 +24,7 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/admin-insights', adminInsightsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/coupons', couponsRouter);
-app.use('/api/auth/google', googleAuthRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.get('/', (_req, res) => {
   res.json({

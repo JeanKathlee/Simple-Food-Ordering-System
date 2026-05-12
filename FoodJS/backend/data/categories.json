@@ -3,7 +3,8 @@
     {
       "id": "cat-burgers",
       "name": "Burgers",
-      "description": "Classic and premium burger options"
+      "description": "Classic and premium burger options",
+      "updatedAt": "2026-05-09T01:39:56.530Z"
     },
     {
       "id": "cat-sides",
