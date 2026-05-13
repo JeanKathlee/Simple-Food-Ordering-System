@@ -38,14 +38,26 @@ router.post('/google/callback', async (req, res) => {
     const googleUser = userInfoResponse.data;
     console.log('Google user:', googleUser.email);
 
+    if (!googleUser.email) {
+      return res.status(400).json({ message: 'Email not provided by Google' });
+    }
+
     const usersData = readJsonFromData('users.json');
+    if (!usersData.users || !Array.isArray(usersData.users)) {
+      usersData.users = [];
+    }
+
     let user = usersData.users.find((u) => u.email === googleUser.email);
 
     if (!user) {
-      const newId = Math.max(...usersData.users.map((u) => u.id), 0) + 1;
+      const existingIds = usersData.users
+        .map((u) => u.id)
+        .filter((id) => typeof id === 'number');
+      const newId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+      
       user = {
         id: newId,
-        name: googleUser.name,
+        name: googleUser.name || 'Google User',
         email: googleUser.email,
         password: 'google-oauth',
         role: 'customer',
@@ -53,6 +65,9 @@ router.post('/google/callback', async (req, res) => {
       };
       usersData.users.push(user);
       writeJsonToData('users.json', usersData);
+      console.log('New user created:', googleUser.email);
+    } else {
+      console.log('Existing user found:', googleUser.email);
     }
 
     // Generate JWT token
@@ -75,6 +90,7 @@ router.post('/google/callback', async (req, res) => {
     });
   } catch (error) {
     console.error('Google OAuth error:', error.message);
+    console.error('Full error stack:', error.stack);
     if (error.response) {
       console.error('Google API response error:', error.response.status, error.response.data);
     }
