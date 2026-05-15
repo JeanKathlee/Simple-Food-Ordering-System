@@ -1,0 +1,22 @@
+{
+  "cartItems": [
+    {
+      "userId": 5,
+      "menuItemId": "M-4001",
+      "name": "Chocolate Cake",
+      "price": 89,
+      "quantity": 1,
+      "selectedChoice": "Go Regular Iced Tea",
+      "updatedAt": "2026-05-02T01:47:26.461Z"
+    },
+    {
+      "userId": 7,
+      "menuItemId": "M-1002",
+      "name": "Fried Chicken Burger",
+      "price": 149,
+      "quantity": 1,
+      "selectedChoice": null,
+      "updatedAt": "2026-05-07T10:03:33.730Z"
+    }
+  ]
+}
