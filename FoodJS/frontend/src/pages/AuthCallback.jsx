@@ -15,6 +15,7 @@ export default function AuthCallback() {
 
     const handleCallback = async () => {
       const code = params.get("code");
+      const redirectUri = `${window.location.origin}/auth/callback`;
 
       if (!code) {
         errorNotif("No authorization code received");
@@ -26,7 +27,7 @@ export default function AuthCallback() {
         const res = await fetch("/api/auth/google/callback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
+          body: JSON.stringify({ code, redirectUri }),
         });
 
         const data = await res.json();

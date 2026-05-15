@@ -12,7 +12,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret-key";
 
 router.post('/google/callback', async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, redirectUri: requestRedirectUri } = req.body;
+    const redirectUri = requestRedirectUri || process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5173/auth/callback';
 
     if (!code) {
       return res.status(400).json({ message: 'Authorization code is required' });
@@ -25,7 +26,7 @@ router.post('/google/callback', async (req, res) => {
       client_secret: GOOGLE_CLIENT_SECRET,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: 'http://localhost:5173/auth/callback',
+      redirect_uri: redirectUri,
     });
 
     console.log('Token response received');

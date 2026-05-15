@@ -3,7 +3,7 @@
     {
       "id": "M-1001",
       "name": "Double Smash Burger",
-      "description": "Double-seared beef patties with cheddar, lettuce, onions, and signature sauce.",
+      "description": "",
       "price": 179,
       "categoryId": "cat-burgers",
       "category": "Burgers",
@@ -12,7 +12,7 @@
       "soldCount": 162,
       "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60",
       "createdAt": "2026-04-29T15:46:15.446Z",
-      "updatedAt": "2026-04-29T15:46:15.446Z"
+      "updatedAt": "2026-05-15T14:34:13.815Z"
     },
     {
       "id": "M-1002",
