@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -28,16 +29,29 @@ app.use('/api/coupons', couponsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/auth', authRouter);
 
-app.get('/', (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({
-    message: 'Simple Food Ordering API is running',
-    environment: 'development',
+    status: 'ok',
+    service: 'FoodJS API',
+    environment: process.env.NODE_ENV || 'development',
   });
 });
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ message: 'API endpoint not found' });
+});
+
+if (process.env.NODE_ENV === 'production') {
+  const frontendDist = path.resolve(__dirname, '../frontend/dist');
+  app.use(express.static(frontendDist));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
 
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ message: 'Internal server error' });
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`FoodJS running on port ${PORT}`));

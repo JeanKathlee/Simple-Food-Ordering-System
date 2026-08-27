@@ -1,13 +1,13 @@
 const COUPON_FORMAT = /^[A-Z0-9]{4,12}$/;
 
 function validateCoupon(couponCode, orderAmount, couponsData) {
-  const normalizedCode = String(couponCode || '').trim().toUpperCase();
+  const normalizedCode = String(couponCode || '').trim();
 
   if (!COUPON_FORMAT.test(normalizedCode)) {
-    return { valid: false, error: 'Invalid coupon format' };
+    return { valid: false, error: 'Coupon codes are case-sensitive. Use uppercase letters and numbers only.' };
   }
 
-  const coupon = couponsData.coupons.find(c => c.code.toUpperCase() === normalizedCode);
+  const coupon = couponsData.coupons.find(c => c.code === normalizedCode);
 
   if (!coupon) {
     return { valid: false, error: 'Coupon not found' };

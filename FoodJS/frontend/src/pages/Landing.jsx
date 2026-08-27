@@ -42,19 +42,19 @@ const categories = [
 const featuredMenu = [
   {
     name: "Smoky Angus Burger",
-    price: "Php 169",
+    price: "₱169.00",
     image:
       "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80",
   },
   {
     name: "Crispy Chicken Box",
-    price: "Php 199",
+    price: "₱199.00",
     image:
       "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=900&q=80",
   },
   {
     name: "Choco Caramel Sundae",
-    price: "Php 89",
+    price: "₱89.00",
     image:
       "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=80",
   },

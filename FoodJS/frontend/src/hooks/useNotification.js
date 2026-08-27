@@ -8,21 +8,23 @@ export function useNotification() {
     throw new Error("useNotification must be used within NotificationProvider");
   }
 
+  const { showNotification } = context;
+
   const success = useCallback(
-    (message, duration = 3000) => context.showNotification(message, "success", duration),
-    [context]
+    (message, duration = 3000) => showNotification(message, "success", duration),
+    [showNotification]
   );
   const error = useCallback(
-    (message, duration = 4000) => context.showNotification(message, "error", duration),
-    [context]
+    (message, duration = 4000) => showNotification(message, "error", duration),
+    [showNotification]
   );
   const info = useCallback(
-    (message, duration = 3000) => context.showNotification(message, "info", duration),
-    [context]
+    (message, duration = 3000) => showNotification(message, "info", duration),
+    [showNotification]
   );
   const warning = useCallback(
-    (message, duration = 3000) => context.showNotification(message, "warning", duration),
-    [context]
+    (message, duration = 3000) => showNotification(message, "warning", duration),
+    [showNotification]
   );
 
   return useMemo(

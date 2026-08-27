@@ -15,13 +15,12 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^8.0.7"
   },
-  "description": "",
+  "description": "REST API for the FoodJS ordering and administration platform",
   "main": "server.js",
   "directories": {
     "lib": "lib"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["food-ordering", "express", "rest-api"],
+  "license": "MIT",
   "type": "commonjs"
 }

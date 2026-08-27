@@ -6,7 +6,7 @@ const dessertsImg = "https://images.unsplash.com/photo-1495147466023-ac5c588e2e9
 // Fetch menu items gikan backend API
 export async function fetchMenuFromBackend() {
   try {
-    const response = await fetch("http://localhost:3001/api/menu");
+    const response = await fetch("/api/menu");
     if (!response.ok) {
       throw new Error(`Menu API error: ${response.status}`);
     }
@@ -48,7 +48,11 @@ export function getMenuItemById(menuItems, id) {
 }
 
 export function formatPrice(value) {
-  return `Php ${Number(value).toFixed(2)}`;
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+  }).format(Number(value) || 0);
 }
 
 // Add image URL sa menu item pende sa category

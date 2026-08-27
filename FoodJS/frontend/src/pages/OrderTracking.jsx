@@ -12,6 +12,7 @@ export default function OrderTracking() {
   const [loading, setLoading] = useState(true);
   const [orderNotifications, setOrderNotifications] = useState([]);
   const [noticesLoading, setNoticesLoading] = useState(true);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
   const loadOrder = async () => {
     try {
@@ -78,13 +79,11 @@ export default function OrderTracking() {
     }, 5000);
     
     return () => clearInterval(interval);
+    // Reload only when the tracked order or navigation context changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, navigate]);
 
-  const handleCancelOrder = async () => {
-    if (!window.confirm("Are you sure you want to cancel this order?")) {
-      return;
-    }
-
+  const confirmCancelOrder = async () => {
     try {
       const session = getAuthSession();
       const token = session?.token;
@@ -97,13 +96,16 @@ export default function OrderTracking() {
       if (response.ok) {
         const updated = await response.json();
         setOrder(updated);
+        setCancelConfirmOpen(false);
         success("Order cancelled successfully!");
       } else {
         const error = await response.json();
+        setCancelConfirmOpen(false);
         errorNotif(error.message || "Failed to cancel order");
       }
     } catch (err) {
       console.error("Error cancelling order:", err);
+      setCancelConfirmOpen(false);
       errorNotif("Error: " + err.message);
     }
   };
@@ -229,7 +231,7 @@ export default function OrderTracking() {
             </div>
 
             {canCancel && (
-              <button className="client-btn danger" onClick={handleCancelOrder}>
+              <button className="client-btn danger" onClick={() => setCancelConfirmOpen(true)}>
                 Cancel Order
               </button>
             )}
@@ -274,6 +276,44 @@ export default function OrderTracking() {
           </aside>
         </div>
       </div>
+
+      {cancelConfirmOpen && (
+        <div
+          className="client-modal-backdrop"
+          role="presentation"
+          onClick={() => setCancelConfirmOpen(false)}
+        >
+          <div
+            className="client-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cancel-order-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="client-modal-kicker">Cancel order</span>
+            <h2 id="cancel-order-title">Cancel this order?</h2>
+            <p>
+              Order {order.id} will be marked as cancelled. You can place a new order from the menu anytime.
+            </p>
+            <div className="client-modal-summary">
+              <span>Total</span>
+              <strong>{formatPrice(order.total)}</strong>
+            </div>
+            <div className="client-modal-actions">
+              <button
+                type="button"
+                className="client-btn ghost"
+                onClick={() => setCancelConfirmOpen(false)}
+              >
+                Keep Order
+              </button>
+              <button type="button" className="client-btn danger" onClick={confirmCancelOrder}>
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

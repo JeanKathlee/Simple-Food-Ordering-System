@@ -103,7 +103,6 @@ export default function CategoryManagement({
                   type="button"
                   className="admin-btn admin-btn-danger"
                   onClick={() => onDeleteCategory(category.id, itemCount)}
-                  disabled={itemCount > 0}
                   title={itemCount > 0 ? "Move or delete related items first" : "Delete category"}
                 >
                   Delete

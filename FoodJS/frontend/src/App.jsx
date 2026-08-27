@@ -1,20 +1,22 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import AuthCallback from "./pages/AuthCallback";
-import Dashboard from "./pages/Dashboard";
-import Menu from "./pages/Menu";
-import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderTracking from "./pages/OrderTracking";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import OrderHistory from "./pages/OrderHistory";
-import Profile from "./pages/Profile";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationContainer } from "./components/NotificationContainer";
 import { getUserRole, isAuthenticated } from "./lib/auth";
+
+const Landing = lazy(() => import("./pages/Landing"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Menu = lazy(() => import("./pages/Menu"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderTracking = lazy(() => import("./pages/OrderTracking"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const OrderHistory = lazy(() => import("./pages/OrderHistory"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 function AdminRoute({ children }) {
   if (!isAuthenticated()) {
@@ -45,6 +47,7 @@ export default function App() {
     <NotificationProvider>
       <BrowserRouter>
         <NotificationContainer />
+      <Suspense fallback={<div className="app-loading" role="status">Loading FoodJS...</div>}>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -124,6 +127,7 @@ export default function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
       </BrowserRouter>
     </NotificationProvider>
   );

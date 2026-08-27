@@ -1,7 +1,8 @@
 {
   "name": "foodjs",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Responsive customer ordering experience and admin dashboard for FoodJS",
   "type": "module",
   "scripts": {
     "dev": "vite",

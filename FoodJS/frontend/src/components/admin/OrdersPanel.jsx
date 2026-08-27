@@ -174,17 +174,8 @@ export default function OrdersPanel({
                     <td>
                       <button
                         type="button"
+                        className="admin-btn admin-btn-danger admin-table-action"
                         onClick={() => onDeleteOrder && onDeleteOrder(order.id)}
-                        style={{
-                          padding: "6px 12px",
-                          backgroundColor: "#ff4444",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                        }}
                       >
                         Delete
                       </button>

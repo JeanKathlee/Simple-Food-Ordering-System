@@ -117,13 +117,12 @@ function calculateSoldCounts(items = [], allOrders = []) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { success, error: errorNotif, warning: warnNotif } = useNotification();
+  const { success, error: errorNotif } = useNotification();
   const session = useMemo(() => getAuthSession(), []);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [coupons, setCoupons] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [weeklyRevenue, setWeeklyRevenue] = useState(DEFAULT_WEEKLY_REVENUE);
   const [statusOptions, setStatusOptions] = useState(DEFAULT_STATUS_OPTIONS);
@@ -141,6 +140,9 @@ export default function Dashboard() {
     title: "",
     message: "",
     confirmLabel: "Delete",
+    cancelLabel: "Cancel",
+    hideCancel: false,
+    confirmVariant: "danger",
     onConfirm: () => {},
   });
 
@@ -163,7 +165,7 @@ export default function Dashboard() {
           fetch("/api/coupons"),
         ]);
 
-      const [categoryData, menuData, orderData, insightData, couponData] = await Promise.all([
+      const [categoryData, menuData, , insightData, couponData] = await Promise.all([
         categoriesResponse.json(),
         menuResponse.json(),
         ordersResponse.json(),
@@ -232,30 +234,39 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeleteOrder = async (orderId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this order? This action cannot be undone."
-    );
-    if (!confirmDelete) return;
+  const handleDeleteOrder = (orderId) => {
+    const order = allOrders.find((item) => item.id === orderId);
 
-    try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.token}`,
-        },
-      });
+    setModalConfig({
+      open: true,
+      title: "Delete order",
+      message: `Order ${orderId}${order?.customerName ? ` for ${order.customerName}` : ""} will be permanently removed from the records.`,
+      confirmLabel: "Delete Order",
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`/api/orders/${orderId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session?.token}`,
+            },
+          });
 
-      if (response.ok) {
-        setAllOrders((prev) => prev.filter((order) => order.id !== orderId));
-        success("Order deleted successfully!");
-      } else {
-        errorNotif("Failed to delete order");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      errorNotif("Error deleting order");
-    }
+          if (response.ok) {
+            setAllOrders((prev) => prev.filter((item) => item.id !== orderId));
+            setModalConfig((current) => ({ ...current, open: false }));
+            success("Order deleted successfully!");
+            bumpSyncState("orders");
+          } else {
+            errorNotif("Failed to delete order");
+            setModalConfig((current) => ({ ...current, open: false }));
+          }
+        } catch (err) {
+          console.error("Error:", err);
+          errorNotif("Error deleting order");
+          setModalConfig((current) => ({ ...current, open: false }));
+        }
+      },
+    });
   };
 
   useEffect(() => {
@@ -267,28 +278,9 @@ export default function Dashboard() {
     }, 15000);
 
     return () => clearInterval(pollingId);
+    // The loaders intentionally retain the authenticated session captured on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const filteredOrders = useMemo(() => {
-    const customerFilter = filters.customer.trim().toLowerCase();
-    const searchFilter = filters.search.trim().toLowerCase();
-
-    return orders
-      .filter((order) => {
-        const statusMatch = filters.status === "All" || order.status === filters.status;
-        const dateMatch = matchesDate(order.createdAt, filters.fromDate, filters.toDate);
-        const customerMatch =
-          !customerFilter || order.customerName.toLowerCase().includes(customerFilter);
-
-        const searchMatch =
-          !searchFilter ||
-          order.id.toLowerCase().includes(searchFilter) ||
-          order.customerName.toLowerCase().includes(searchFilter);
-
-        return statusMatch && dateMatch && customerMatch && searchMatch;
-      })
-      .sort(compareOrdersNewestFirst);
-  }, [filters, orders]);
 
   const filteredAdminOrders = useMemo(() => {
     const customerFilter = filters.customer.trim().toLowerCase();
@@ -500,16 +492,32 @@ export default function Dashboard() {
   };
 
   const handleDeleteCategory = async (id, itemCount) => {
+    const category = categories.find((item) => item.id === id);
+
     if (itemCount > 0) {
-      warnNotif("Cannot delete category with items. Remove items first.");
+      setModalConfig({
+        open: true,
+        title: "Category still has items",
+        message: `${category?.name || "This category"} has ${itemCount} menu item${itemCount === 1 ? "" : "s"}. Delete or move those items before deleting the category.`,
+        confirmLabel: "Manage Items",
+        hideCancel: true,
+        confirmVariant: "primary",
+        onConfirm: () => {
+          setModalConfig((current) => ({ ...current, open: false }));
+          setActiveSection("menu");
+        },
+      });
       return;
     }
 
     setModalConfig({
       open: true,
       title: "Delete category",
-      message: "This category will be removed from your menu organization.",
+      message: `${category?.name || "This category"} will be removed from your menu organization.`,
       confirmLabel: "Delete Category",
+      cancelLabel: "Keep Category",
+      hideCancel: false,
+      confirmVariant: "danger",
       onConfirm: async () => {
         try {
           const session = getAuthSession();
@@ -528,7 +536,15 @@ export default function Dashboard() {
           }
 
           setCategories((current) => current.filter((category) => category.id !== id));
-          setModalConfig((current) => ({ ...current, open: false }));
+          setModalConfig({
+            open: true,
+            title: "Category deleted",
+            message: `${category?.name || "The category"} was removed successfully.`,
+            confirmLabel: "Done",
+            hideCancel: true,
+            confirmVariant: "primary",
+            onConfirm: () => setModalConfig((current) => ({ ...current, open: false })),
+          });
           success("Category deleted successfully!");
           bumpSyncState("categories");
         } catch (err) {
@@ -673,7 +689,7 @@ export default function Dashboard() {
 
         {activeSection === "orders" && (
           <OrdersPanel
-            orders={filteredOrders}
+            orders={filteredAdminOrders}
             statusOptions={statusOptions}
             filters={filters}
             onFilterChange={handleOrderFilter}
@@ -736,6 +752,9 @@ export default function Dashboard() {
         title={modalConfig.title}
         message={modalConfig.message}
         confirmLabel={modalConfig.confirmLabel}
+        cancelLabel={modalConfig.cancelLabel}
+        hideCancel={modalConfig.hideCancel}
+        confirmVariant={modalConfig.confirmVariant}
         onCancel={closeModal}
         onConfirm={modalConfig.onConfirm}
       />

@@ -16,7 +16,7 @@ function isValidMobileNumber(value = "") {
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { success, error: errorNotif, info } = useNotification();
+  const { success, error: errorNotif } = useNotification();
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [couponCode, setCouponCode] = useState("");
@@ -148,7 +148,7 @@ export default function Checkout() {
   }, [profileDefaults, savedAddresses]);
 
   const handleApplyCoupon = async () => {
-    const normalizedCode = couponCode.trim().toUpperCase();
+    const normalizedCode = couponCode.trim();
     const isValidFormat = /^[A-Z0-9]{4,12}$/.test(normalizedCode);
 
     if (!normalizedCode) {
@@ -157,7 +157,7 @@ export default function Checkout() {
     }
 
     if (!isValidFormat) {
-      setCouponError("Coupon must be 4-12 letters or numbers");
+      setCouponError("Coupon codes are case-sensitive. Use uppercase letters and numbers only.");
       return;
     }
 
@@ -179,7 +179,7 @@ export default function Checkout() {
         setAppliedCoupon(null);
         setDiscountAmount(0);
       }
-    } catch (err) {
+    } catch (_err) {
       setCouponError("Error validating coupon");
     }
   };

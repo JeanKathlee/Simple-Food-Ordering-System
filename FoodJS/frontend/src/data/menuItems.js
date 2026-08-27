@@ -5,7 +5,7 @@ export const tabs = ["All", "Burgers", "Sides", "Drinks", "Desserts"];
 
 export const menuItems = [];
 
-export function getMenuItemByName(name) {
+export function getMenuItemByName() {
   console.warn(
     "getMenuItemByName is deprecated. Use getMenuItemById with backend ID instead."
   );

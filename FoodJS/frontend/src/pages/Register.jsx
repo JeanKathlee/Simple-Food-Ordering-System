@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { saveAuthSession, isAuthenticated, getAuthSession } from "../lib/auth";
@@ -83,7 +83,7 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <motion.form
+      <Motion.form
         className="auth-card"
         onSubmit={handleRegister}
         initial={{ opacity: 0, y: 20 }}
@@ -176,7 +176,7 @@ export default function Register() {
             Sign-in
           </Link>
         </p>
-      </motion.form>
+      </Motion.form>
     </div>
   );
 }

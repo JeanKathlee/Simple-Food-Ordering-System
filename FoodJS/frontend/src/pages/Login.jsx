@@ -1,22 +1,9 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { getAuthSession, isAuthenticated, saveAuthSession } from "../lib/auth";
 import logo from "../../assets/logo.png";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
 
 function getRoleRoute(role) {
   return role === "admin" ? "/dashboard" : "/menu";
@@ -82,7 +69,7 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <motion.form
+      <Motion.form
         className="auth-card"
         onSubmit={handleLogin}
         initial={{ opacity: 0, y: 20 }}
@@ -94,8 +81,13 @@ export default function Login() {
         </div>
 
         <h2 className="auth-title">LOGIN</h2>
+        <p className="demo-login-note">
+          <strong>Customer demo:</strong> enter any email and password.
+          <br />
+          <strong>Admin demo:</strong> admin@foodjs.demo / admin123
+        </p>
 
-        <motion.div 
+        <Motion.div 
           className="input-group" 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -110,9 +102,9 @@ export default function Login() {
             required
           />
           <span className="icon">📧</span>
-        </motion.div>
+        </Motion.div>
 
-        <motion.div 
+        <Motion.div 
           className="input-group" 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,29 +126,29 @@ export default function Login() {
           >
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
-        </motion.div>
+        </Motion.div>
 
         {error && (
-          <motion.p 
+          <Motion.p 
             className="form-error"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
             {error}
-          </motion.p>
+          </Motion.p>
         )}
 
-        <motion.div 
+        <Motion.div 
           className="forgot-container"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           <a href="#forgot" className="forgot">Forgot Password?</a>
-        </motion.div>
+        </Motion.div>
 
-        <motion.button 
+        <Motion.button 
           className="btn-primary" 
           type="submit" 
           disabled={loading}
@@ -165,9 +157,9 @@ export default function Login() {
           transition={{ delay: 0.4, duration: 0.4 }}
         >
           {loading ? "Logging in..." : "Login"}
-        </motion.button>
+        </Motion.button>
 
-        <motion.button
+        <Motion.button
           className="btn-secondary"
           type="button"
           onClick={handleGoogleLogin}
@@ -176,9 +168,9 @@ export default function Login() {
           transition={{ delay: 0.5, duration: 0.4 }}
         >
           Login with Google
-        </motion.button>
+        </Motion.button>
 
-        <motion.p 
+        <Motion.p 
           className="text"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -188,8 +180,8 @@ export default function Login() {
           <Link to="/register" className="link">
             Sign Up
           </Link>
-        </motion.p>
-      </motion.form>
+        </Motion.p>
+      </Motion.form>
     </div>
   );
 }

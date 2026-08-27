@@ -23,7 +23,13 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        caughtErrors: 'none',
+        varsIgnorePattern: '^[A-Z_]',
+      }],
+      // Initial data loading in these screens is an intentional effect.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ])

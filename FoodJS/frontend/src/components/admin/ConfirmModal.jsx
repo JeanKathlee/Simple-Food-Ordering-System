@@ -3,6 +3,9 @@ export default function ConfirmModal({
   title,
   message,
   confirmLabel,
+  cancelLabel = "Cancel",
+  hideCancel = false,
+  confirmVariant = "danger",
   onCancel,
   onConfirm,
 }) {
@@ -23,10 +26,16 @@ export default function ConfirmModal({
         <p>{message}</p>
 
         <div className="admin-modal-actions">
-          <button type="button" className="admin-btn admin-btn-light" onClick={onCancel}>
-            Cancel
-          </button>
-          <button type="button" className="admin-btn admin-btn-danger" onClick={onConfirm}>
+          {!hideCancel && (
+            <button type="button" className="admin-btn admin-btn-light" onClick={onCancel}>
+              {cancelLabel}
+            </button>
+          )}
+          <button
+            type="button"
+            className={`admin-btn admin-btn-${confirmVariant}`}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </button>
         </div>

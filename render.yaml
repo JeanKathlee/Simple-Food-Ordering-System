@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: foodjs-demo
+    runtime: node
+    rootDir: FoodJS
+    plan: free
+    buildCommand: npm ci --prefix frontend && npm ci --prefix backend && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DEMO_MODE
+        value: "true"

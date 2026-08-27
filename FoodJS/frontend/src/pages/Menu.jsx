@@ -92,66 +92,6 @@ export default function Menu() {
     });
   };
 
-  const addToCart = async (item) => {
-    try {
-      const session = getAuthSession();
-      const token = session?.token;
-      
-      if (!token) {
-        errorNotif("Please log in to add items to cart");
-        return;
-      }
-
-      const response = await fetch("/api/cart/items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          menuItemId: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: 1,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Failed to add to cart:", response.status, error);
-        errorNotif(error?.message || "Failed to add item to cart");
-        return;
-      }
-
-      // Add or update in local state
-      setCartItems((prev) => {
-        success(`${item.name} added to cart!`);
-        const existing = prev.find((cart) => cart.menuItemId === item.id);
-        if (existing) {
-          return prev.map((cart) =>
-            cart.menuItemId === item.id
-              ? { ...cart, quantity: cart.quantity + 1 }
-              : cart
-          );
-        }
-        return [
-          ...prev,
-          {
-            userId: session?.user?.id,
-            menuItemId: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: 1,
-            selectedChoice: null,
-          },
-        ];
-      });
-    } catch (err) {
-      console.error("Failed to add to cart:", err);
-      errorNotif("Network error: " + err.message);
-    }
-  };
-
   const adjustQuantity = async (menuItemId, newQuantity) => {
     if (newQuantity <= 0) {
       await removeFromCart(menuItemId);
@@ -272,8 +212,6 @@ export default function Menu() {
     () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
     [cartItems]
   );
-
-  const hasCartItems = cartItems.length > 0;
 
   return (
     <div className="client-page menu-page">
@@ -473,7 +411,16 @@ export default function Menu() {
                     onClick={() => openProductDetails(item)}
                     aria-label={`View ${item.name} details`}
                   >
-                    <img src={item.image} alt={item.name} className="menu-card-image" />
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="menu-card-image"
+                      loading="lazy"
+                      onError={(event) => {
+                        event.currentTarget.src = logo;
+                        event.currentTarget.classList.add("is-fallback");
+                      }}
+                    />
                   </button>
                   <div className="menu-card-body">
                     <h3>{item.name}</h3>
@@ -483,7 +430,7 @@ export default function Menu() {
                     <strong>{formatPrice(item.price)}</strong>
                     <div className="menu-card-actions">
                       <button type="button" className="client-btn primary" onClick={() => openProductDetails(item)}>
-                        Add to cart
+                        View item
                       </button>
                     </div>
                   </div>
