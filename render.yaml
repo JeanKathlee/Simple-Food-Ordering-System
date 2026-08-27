@@ -4,7 +4,7 @@ services:
     runtime: node
     rootDir: FoodJS
     plan: free
-    buildCommand: npm ci --prefix frontend && npm ci --prefix backend && npm run build
+    buildCommand: npm ci --include=dev --prefix frontend && npm ci --omit=dev --prefix backend && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeployTrigger: commit
