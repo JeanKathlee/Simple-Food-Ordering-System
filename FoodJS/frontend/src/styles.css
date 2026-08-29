@@ -2716,17 +2716,6 @@ body {
   color: #a23a1b;
 }
 
-.demo-login-note {
-  padding: 10px 12px;
-  border: 1px solid #fed7aa;
-  border-radius: 10px;
-  background: #fff7ed;
-  color: #9a3412;
-  font-size: 12px;
-  line-height: 1.5;
-  text-align: center;
-}
-
 /* Portfolio-ready menu cards */
 .menu-layout .menu-grid {
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));

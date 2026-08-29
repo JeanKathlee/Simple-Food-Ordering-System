@@ -81,11 +81,6 @@ export default function Login() {
         </div>
 
         <h2 className="auth-title">LOGIN</h2>
-        <p className="demo-login-note">
-          <strong>Customer demo:</strong> enter any email and password.
-          <br />
-          <strong>Admin demo:</strong> admin@foodjs.demo / admin123
-        </p>
 
         <Motion.div 
           className="input-group" 
